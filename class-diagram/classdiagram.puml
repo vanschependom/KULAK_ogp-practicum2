@@ -74,7 +74,7 @@ __
     + int getIndexOf(Item item)
     + boolean hasAsItem(Item item)
     + void makeRoot()
-.. Overriddes ..
+.. Overrides ..
     + boolean canHaveAsName()
     + boolean isDeleteable()
     + void delete() (destructor)
