@@ -1,0 +1,33 @@
+@startuml
+
+class File {
+
+    - size: int
+    - MAX_SIZE: int (static)
+    - name: String
+    - creationTime: Date
+    - modificationTime: Date
+    - writeable: boolean
+
+    + File(name: String, size: int, writeable: boolean)
+    + File(name: String)
+
+    + isWriteable(): boolean
+    + canHaveAsSize(size: int): boolean
+    + enlarge(amountOfBits: int): void
+    + shorten(amountOfBits: int): void
+    + changeName(newName: String): void
+    + hasOverlappingUsagePeriod(other: File): boolean
+
+    + getSize(): int
+    + setSize(size: int): void
+    + getName(): String
+    - setName(name: String): void
+    + setWriteable(writeable: boolean): void
+    + getCreationTime(): Date
+    + getModificationTime(): Date
+    - setModificationTime(modificationTime: Date): void
+
+}
+
+@enduml
