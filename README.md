@@ -1,0 +1,1 @@
+# KULAK_ogp-practicum2
