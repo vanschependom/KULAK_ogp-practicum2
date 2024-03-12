@@ -1,32 +1,107 @@
 @startuml
 
+package filesystem {
+
+abstract Item {
+    - String name
+    - Date creationTime
+    - Date modificationTime
+__
+    + Item(String name)
+..
+    + boolean canHaveAsName()
+    + void changeName()
+    + boolean isDeleteable()
+    + void delete() (destructor)
+    + boolean hasOverlappingUsagePeriod(Item other)
+    + void move()
+    + Directory getRoot()
+    + boolean isDirectorOrIndirectChildOf(Directory dir)
+    + int getTotalDiskUsage()
+    + String getAbsolutePath()
+    + deleteRecursive()
+..Getters & setters..
+    + Date getCreationTime()
+    + Date getModificationTime()
+    - void setModificationTime(Date modificationTime)
+}
+
 class File {
+    - int size
+    - {static} int MAX_SIZE
+    - boolean writeable
+    - final Filetype type
+__
+    + File(Directory dir, String name, float size, boolean writeable, Filetype type)
+    + File(Directory dir, String name, Filetype type)
+..
+    + boolean isWriteable()
+    + boolean canHaveAsSize(int size)
+    + void enlarge(int amountOfBits)
+    + void shorten(int amountOfBits)
+..Getters & setters..
+    + float getSize()
+    + void setSize(int size)
+    + Sting getName()
+    - void setName(String name)
+    + void setWriteable(boolean writeable)
+..Overrides..
+    + boolean isDeleteable()
+    + void delete() (destructor)
+    + int getTotalDiskUsage()
+}
 
-    - size: int
-    - MAX_SIZE: int (static)
-    - name: String
-    - creationTime: Date
-    - modificationTime: Date
-    - writeable: boolean
+enum Filetype {
+    TEXT("txt"),
+    PDF("pdf"),
+    JAVA("java")
+}
 
-    + File(name: String, size: int, writeable: boolean)
-    + File(name: String)
+class Directory {
+    - boolean writeable
+    - ArrayList<Item> items
+__
+    + Directory(Directory dir, String name, boolean writeable)
+    + Directory(Directory dir, String name)
+    + Directory(String name, boolean writable)
+    + Directory(String name)
+__
+    + void addItem(Item item)
+    + int getNbItems()
+    + Item getItemAt(int index)
+    + Item getItem(String name)
+    + boolean containsDiskItemWithName(String name)
+    + int getIndexOf(Item item)
+    + boolean hasAsItem(Item item)
+    + void makeRoot()
+.. Overriddes ..
+    + boolean canHaveAsName()
+    + boolean isDeleteable()
+    + void delete() (destructor)
+    + int getTotalDiskUsage()
+}
 
-    + isWriteable(): boolean
-    + canHaveAsSize(size: int): boolean
-    + enlarge(amountOfBits: int): void
-    + shorten(amountOfBits: int): void
-    + changeName(newName: String): void
-    + hasOverlappingUsagePeriod(other: File): boolean
+class Link {
+    - Item linkedItem (not another link)
+__
+    + Link(Directory dir, String name, Filetype type)
+..
+    + void changeLinkTo(Link link)
+    + void unlink()
+..Overrides..
+    + boolean isDeleteable()
+    + void delete() (destructor)
+    + int getTotalDiskUsage()
+}
 
-    + getSize(): int
-    + setSize(size: int): void
-    + getName(): String
-    - setName(name: String): void
-    + setWriteable(writeable: boolean): void
-    + getCreationTime(): Date
-    + getModificationTime(): Date
-    - setModificationTime(modificationTime: Date): void
+Item <|-- Link: inherits from
+Item <|-- File: inherits from
+Item <|-- Directory: inherits from
+
+File .. Filetype: uses
+
+Link --> File: references
+Link --> Directory: references
 
 }
 
