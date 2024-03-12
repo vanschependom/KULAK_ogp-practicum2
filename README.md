@@ -1,4 +1,4 @@
-# KULAK_ogp-practicum2
+# Practicum 2
 
 Objectgericht Programmeren - KU Leuven Kulak - 2023-2024 <br>
 _Vincent Van Schependom - Flor De Meulemeester - Arne Claerhout_
