@@ -3,6 +3,7 @@ package filesystem;
 import be.kuleuven.cs.som.annotate.*;
 
 import java.util.Date;
+import java.lang.String;
 
 /**
  * A class of items within a filesystem.
@@ -66,6 +67,11 @@ public abstract class Item {
     private String name = null;
 
     /**
+     * Variable for keeping track of the default name index.
+     */
+    private static int nameIndex = 1;
+
+    /**
      * Return the name of this item.
      */
     @Raw @Basic
@@ -118,8 +124,8 @@ public abstract class Item {
      */
     @Model
     private static String getDefaultName() {
-        return "new_item";
-    } //TODO de namen moeten een nummer erachter krijgen of veranderen als deze zich al bevinden in een directory, anders gaan er items zijn met dezelfde naam
+        return "new_item_" + Integer.toString(nameIndex++);
+    }
 
     /**
      * Change the name of this item to the given name.
