@@ -1,0 +1,135 @@
+@startuml
+
+package filesystem {
+
+abstract Item {
+    - String name
+    - Date creationTime
+    - Date modificationTime
+    - Directory parent
+__
+    + Item(String naam)
+..
+    + void changeName(String name)
+    + boolean isDeleteable()
+    + void delete() (destructor)
+    + boolean hasOverlappingUsagePeriod(Item other)
+    + void move(Directory dir)
+    + Directory getRoot()
+    + boolean isDirectorOrIndirectChildOf(Directory dir)
+    + int getTotalDiskUsage()
+    + String getAbsolutePath()
+    + deleteRecursive()
+..Getters & setters..
+    + String getName()
+    - void setName(String name)
+    - {static} String getDefaultName()
+    + Date getCreationTime()
+    + Date getModificationTime()
+    - void setModificationTime(Date modificationTime)
+..Checkers..
+    + {static} boolean isValidCreationTime(Date date)
+    + boolean isValidName(String name)
+    + boolean canHaveAsModificationTime(Date date)
+    + boolean canHaveAsParent()
+    + boolean hasProperParent()
+}
+
+class File {
+    - int size
+    - {static} int maximumSize
+    - final Filetype type
+    - boolean writeable
+__
+    + File(Directory dir, String name, float size, boolean writeable, Filetype type)
+    + File(Directory dir, String name, Filetype type)
+..
+    + void enlarge(int delta)
+    + void shorten(int delta)
+    - void changeSize(int delta)
+..Getters & setters..
+    + int getSize()
+    - void setSize(int size)
+    + int getMaximumSize()
+    + Filetype getFiletype()
+    + Sting getName()
+    - void setName(String name)
+    + void setWriteable()
+    + boolean isWriteable()
+..Checkers..
+    + {static} boolean isValidSize(int size)
+    + {static} boolean canHaveAsFiletype(Filetype type)
+..Overrides..
+    + boolean isDeleteable()
+    + void delete() (destructor)
+    + int getTotalDiskUsage()
+    + boolean canHaveAsParent()
+}
+
+enum Filetype {
+    TEXT("txt"),
+    PDF("pdf"),
+    JAVA("java")
+}
+
+class Directory {
+    - ArrayList<Item> items
+    - boolean writeable
+__
+    + Directory(Directory dir, String name, boolean writeable)
+    + Directory(Directory dir, String name)
+    + Directory(String name, boolean writable)
+    + Directory(String name)
+__
+    + void addItem(Item item)
+    + int getNbItems()
+    + Item getItemAt(int index)
+    + Item getItem(String name)
+    + boolean containsDiskItemWithName(String name)
+    + int getIndexOf(Item item)
+    + boolean hasAsItem(Item item)
+    + void makeRoot()
+    - int getIndexForItem(Item item)
+    - void insertItemAtIndex(int index)
+    + void setWriteable()
+    + boolean isWriteable()
+..Checkers..
+    + {static} boolean isValidItem(Item item)
+    + boolean hasProperItems()
+.. Overrides ..
+    + boolean isValidName(String name)
+    + boolean canHaveAsName(String name)
+    + boolean isDeleteable()
+    + void delete() (destructor)
+    + int getTotalDiskUsage()
+    + boolean canHaveAsParent()
+}
+
+class Link {
+    - Item linkedItem (not another link)
+__
+    + Link(Directory dir, String name, Filetype type)
+..
+    + void changeLinkTo(Link link)
+    + void unlink()
+..Checkers..
+    + {static} boolean isValidLinkedItem(Item item)
+    + boolean hasProperLinkedItem()
+..Overrides..
+    + void delete() (destructor)
+    + int getTotalDiskUsage()
+    + boolean canHaveAsParent()
+}
+
+Item <|-- Link: inherits from
+Item <|-- File: inherits from
+Item <|-- Directory: inherits from
+
+File .. Filetype: uses
+
+Link --> File: references
+Link --> Directory: references
+
+}
+
+@enduml
