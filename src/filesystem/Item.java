@@ -15,6 +15,8 @@ import java.util.Date;
  *          | canHaveAsModificationTime(getModificationTime())
  * @invar   Each item must have a valid parent directory.
  *          | hasProperParentDirectory();
+ * @invar   Each item must have a valid disk usage.
+ *          | isValidDiskUsage(getDiskUsage());
  *
  * @author  Vincent Van Schependom
  * @author  Flor De Meulemeester
@@ -304,11 +306,12 @@ public abstract class Item {
      * @param   dir
      *          The directory we want the parent directory to be set to.
      * @post    TODO
+     * @note    This is package private because children need to access it.
      *
      * TODO: throws [exception] en de condities voor die exception uitwerken
      */
     @Model
-    private void setParentDirectory(Directory dir) {
+    void setParentDirectory(Directory dir) {
         if ( !canHaveAsParentDirectory(dir) ) {
             // throw exception
         } else {
@@ -325,6 +328,51 @@ public abstract class Item {
     @Model
     private boolean hasProperParentDirectory() {
         return canHaveAsParentDirectory(getParentDirectory());
+    }
+
+
+
+    /**********************************************************
+     * disk usage - nominal programming
+     **********************************************************/
+
+    /**
+     * A variable referencing the disk usage of this item.
+     */
+    private int diskUsage = 0;
+
+    /**
+     * Return the disk usage of this item.
+     */
+    @Basic
+    public int getDiskUsage() {
+        return diskUsage;
+    }
+
+    /**
+     * Check if the given amount of bits is a legal diskUsage amount.
+     *
+     * @param   amtOfBits
+     *          The amount of bits to check.
+     * @return  True if the given amount of bits is positive or equal to zero.
+     *          | result == (amtOfBits >= 0)
+     */
+    public static boolean isValidDiskUsage(int amtOfBits) {
+        return (amtOfBits >= 0);
+    }
+
+    /**
+     * Set the disk usage of this item.
+     * @param   diskUsage
+     *          The number to set the disk usage to.
+     * @pre     The diskUsage to be set must be valid.
+     *          | isValidDiskUsage()
+     * @post    The diskUsage of this item is set to the given amount of bits.
+     * @note    We implemented this nominally, so we expect a legal value.
+     * @note    This is package private, since children must be able to call this method.
+     */
+    void setDiskUsage(int diskUsage) {
+        this.diskUsage = diskUsage;
     }
 
 }
