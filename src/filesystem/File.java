@@ -35,19 +35,39 @@ public class File extends Item {
      *          The writability of the new file.
      * @param   type
      *          The type of the new file
-     *
-     * TODO: post, effect en pre's
-     *
+     * @effect  The name of the file is set to the given name.
+     * 			If the given name is not valid, a default name is set.
+     *          | setName(name)
+     * @effect	The size is set to the given size (must be valid)
+     * 			| setSize(size)
+     * @effect	The writability is set to the given flag
+     * 			| setWritable(writable)
+     * @effect  The parent directory is set to the given directory.
+     *          | new.getParentDirectory() == dir
+     * @post    The disk usage is set to the filesize.
+     *          | new.getDiskUsage() == size
+     * @post    The new creation time of this file is initialized to some time during
+     *          constructor execution.
+     *          | (new.getCreationTime().getTime() >= System.currentTimeMillis()) &&
+     *          | (new.getCreationTime().getTime() <= (new System).currentTimeMillis())
+     * @post    The new file has no time of last modification.
+     *          | new.getModificationTime() == null
      * @throws  [exception]
+     *          The provided parent directory is not a valid parent directory.
+     *          | ! canHaveAsParentDirectory(dir)
+     * @throws  [exception]
+     *          The provided file type is not a valid type.
      *          | ! isValidFileType()
-     * TODO develop exception
+     * TODO develop exceptions and change signature
      */
     public File(Directory dir, String name, int size, boolean writable, FileType type) throws Exception {
-        super(name, dir);
+        super(name, dir); // This can throw an exception! Todo: add to signature and specification
         if (!isValidFileType(type)) {
             // TODO throw exception
         }
-        // todo
+        fileType = type;
+        setWritable(writable);
+        setDiskUsage(size);
     }
 
     // todo less extended constructors die de meest geextende constructor aanroepen
@@ -237,20 +257,26 @@ public class File extends Item {
     }
 
 
+    /**********************************************************
+     * name - total programming
+     **********************************************************/
 
-    /*
-    TODO: changeName uitbreiden zodat er gecheckt wordt op writeability.
-    Zoiets:
-
+    /**
+     * Change the name of this file to the given name.
+     *
+     * @param   name
+     * 			The new name for this item.
+     * @throws  NotWritableException
+     *          This file is not writable.
+     *          | ! isWritable()
+     */
     @Override
-    public void changeName(String name) throws [exception] {
-        if (isWriteable()) {
-            super.changeName();
+    public void changeName(String name) throws NotWritableException {
+        if (isWritable()) {
+            super.changeName(name);
         } else {
-            // throw exception
+            throw new NotWritableException(this);
         }
     }
-
-    */
 
 }
