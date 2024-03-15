@@ -7,7 +7,7 @@ abstract Item {
     - Date creationTime
     - Date modificationTime
 __
-    + Item(String name)
+    + Item(String naam)
 ..
     + boolean canHaveAsName()
     + void changeName()
