@@ -119,7 +119,7 @@ public abstract class Item {
     @Model
     private static String getDefaultName() {
         return "new_item";
-    }
+    } //TODO de namen moeten een nummer erachter krijgen of veranderen als deze zich al bevinden in een directory, anders gaan er items zijn met dezelfde naam
 
     /**
      * Change the name of this item to the given name.

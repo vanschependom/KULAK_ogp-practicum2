@@ -100,7 +100,6 @@ __
     + boolean isRecursivelyDeletable
 .. Overrides ..
     + boolean isValidName(String name)
-    + boolean canHaveAsName(String name)
     + boolean isDeletable()
     + void delete() (destructor)
     + int getTotalDiskUsage()
