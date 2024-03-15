@@ -8,18 +8,17 @@ abstract Item {
     - Date modificationTime
     - Directory parentDirectory
 __
-    + Item(String naam)
+    + Item(String name)
 ..
     + void changeName(String name)
-    + boolean isDeleteable()
+    + boolean isDeletable()
     + void delete() (destructor)
     + boolean hasOverlappingUsagePeriod(Item other)
     + void move(Directory dir)
     + Directory getRoot()
-    + boolean isDirectorOrIndirectChildOf(Directory dir)
+    + boolean isDirectOrIndirectChildOf(Directory dir)
     + int getTotalDiskUsage()
     + String getAbsolutePath()
-    + deleteRecursive()
 ..Getters & setters..
     + String getName()
     - void setName(String name)
@@ -60,7 +59,7 @@ __
     + {static} boolean isValidSize(int size)
     + {static} boolean canHaveAsFiletype(Filetype type)
 ..Overrides..
-    + boolean isDeleteable()
+    + boolean isDeletable()
     + void delete() (destructor)
     + int getTotalDiskUsage()
     + boolean canHaveAsParent()
@@ -91,15 +90,18 @@ __
     + void makeRoot()
     - int getIndexForItem(Item item)
     - void insertItemAtIndex(int index)
+    - void sortItems()
     + void setWriteable()
     + boolean isWriteable()
+    + void deleteRecursive()
 ..Checkers..
     + {static} boolean isValidItem(Item item)
     + boolean hasProperItems()
+    + boolean isRecursivelyDeletable
 .. Overrides ..
     + boolean isValidName(String name)
     + boolean canHaveAsName(String name)
-    + boolean isDeleteable()
+    + boolean isDeletable()
     + void delete() (destructor)
     + int getTotalDiskUsage()
     + boolean canHaveAsParent()
@@ -110,7 +112,7 @@ class Link {
 __
     + Link(Directory dir, String name, Filetype type)
 ..
-    + void changeLinkTo(Link link)
+    - void changeLinkTo(Link link)
     + void unlink()
 ..Checkers..
     + {static} boolean isValidLinkedItem(Item item)
@@ -128,7 +130,8 @@ Item <|-- Directory: inherits from
 File .. Filetype: uses
 
 Link --> File: references
-Link --> Directory: references
+Link "*" -- "1" Directory
+File "*" -- "1" Directory
 
 }
 
