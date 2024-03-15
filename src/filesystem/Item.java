@@ -7,7 +7,7 @@ import java.util.Date;
 /**
  * A class of items within a filesystem.
  *
- * @invar	Each item must have a properly spelled name.
+ * @invar   Each item must have a properly spelled name.
  * 			| isValidName(getName())
  * @invar   Each item must have a valid creation time.
  *          | isValidCreationTime(getCreationTime())
@@ -31,21 +31,21 @@ public abstract class Item {
      * Initialize a new item with given name and parentDirectory.
      * @param   name
      *          The name of the new item.
-     * @param   parentDirectory
+     * @param   dir
      *          The parent directory of the new item.
      * @effect  The name of the item is set to the given name.
      * 			If the given name is not valid, a default name is set.
      *          | setName(name)
      * @effect  The parent directory is set to the given parent directory.
      *          If the given directory is not valid, an exception is thrown.
-     *          | setParentDirectory(parentDirectory)
+     *          | setParentDirectory(dir)
      *
      * TODO: exception voor illegal directory
      */
     @Raw
-    public Item(String name, Directory parentDirectory) {
+    public Item(String name, Directory dir) {
         setName(name);
-        setParentDirectory(parentDirectory);
+        setParentDirectory(dir);
     }
 
     public Item(String name) {
@@ -229,9 +229,11 @@ public abstract class Item {
      *         |                    System.currentTimeMillis()) &&
      *         | (new.getModificationTime().getTime() <=
      *         |                    (new System).currentTimeMillis())
+     * @note    This method is package private, because its children need
+     *          to access it.
      */
     @Model
-    private void setModificationTime() {
+    void setModificationTime() {
         modificationTime = new Date();
     }
 
