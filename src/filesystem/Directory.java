@@ -1,26 +1,29 @@
 package filesystem;
 
-import be.kuleuven.cs.som.annotate.Raw;
+import be.kuleuven.cs.som.annotate.*;
 
 /**
  * A class of directories, inheriting from the class Item, within a filesystem
  * @invar	Each directory must have a valid name.
  * 			| isValidName(getName())
  * @invar   Each directory must have valid contents.
- *          | for each item in items:
+ *          | for each item in Item:
  *          |       item.canHaveAsParent(this)
  * @invar   The contents of the variable items are always ordered.
- *          | after sortItems()
- *          |       for each item in items:
- *          |           getIndexOf(item) == new.getIndexOf(item)
+ *          | isOrdered(items)
  * @invar   The names of the contents of a directory are always unique.
- *          | //TODO een formele specificatie voor dit (ik weet niet hoe)
+ *          | for each item in Item:
+ *          |       for each otherItem in Item:
+ *          |           if (item != otherItem)
+ *          |               item.getName() != otherItem.getName()
  * @invar   The disk-usage of the contents of a directory are always valid.
- *          | for each item in items:
+ *          TODO: ik zou dit gewoon aanpassen naar 1 variabele diskusage die we altijd aanpassen per item dat wordt toegevoegd
+ *          | for each item in Item:
  *          |       item.isValidDiskUsage(item.getDiskUsage())
- * @author Vincent Van Schependom
- * @author Flor De Meulemeester
- * @author Arne Claerhout
+ * @author  Vincent Van Schependom
+ * @author  Flor De Meulemeester
+ * @author  Arne Claerhout
+ * @version 2.0
  */
 public class Directory extends Item {
 
@@ -38,15 +41,18 @@ public class Directory extends Item {
      * @param   writable
      *          The writability of this directory
      * @effect  The name of the directory is set to the given name.
+     *          TODO: we kunnen dit weglaten en vervangen door super(...)
      * 			If the given name is not valid, a default name is set.
      *          | setName(name)
      * @effect	The writability is set to the given boolean
      * 			| setWritable(writable)
      * @post    The new creation time of this directory is initialized to some time during
      *          constructor execution.
+     *          TODO: we kunnen dit weglaten en vervangen door super(...)
      *          | (new.getCreationTime().getTime() >= System.currentTimeMillis()) &&
      *          | (new.getCreationTime().getTime() <= (new System).currentTimeMillis())
      * @post    The new directory has no time of last modification.
+     *          TODO: we kunnen dit weglaten en vervangen door super(...)
      *          | new.getModificationTime() == null
      * @post    The new directory does not have any contents.
      *          | new.getNbItems() == 0
