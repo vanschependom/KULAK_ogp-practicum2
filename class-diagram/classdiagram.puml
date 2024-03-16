@@ -6,49 +6,63 @@ abstract Item {
     - String name
     - Date creationTime
     - Date modificationTime
+    - Directory parentDirectory
 __
-    + Item(String naam)
+    + Item(String name)
 ..
-    + boolean canHaveAsName()
-    + void changeName()
-    + boolean isDeleteable()
+    + void changeName(String name)
+    + boolean isDeletable()
     + void delete() (destructor)
     + boolean hasOverlappingUsagePeriod(Item other)
-    + void move()
+    + void move(Directory dir)
     + Directory getRoot()
-    + boolean isDirectorOrIndirectChildOf(Directory dir)
+    + boolean isDirectOrIndirectChildOf(Directory dir)
     + int getTotalDiskUsage()
     + String getAbsolutePath()
-    + deleteRecursive()
 ..Getters & setters..
+    + String getName()
+    - void setName(String name)
+    - {static} String getDefaultName()
     + Date getCreationTime()
     + Date getModificationTime()
     - void setModificationTime(Date modificationTime)
+..Checkers..
+    + {static} boolean isValidCreationTime(Date date)
+    + boolean isValidName(String name)
+    + boolean canHaveAsModificationTime(Date date)
+    + boolean canHaveAsParentDirectory(Directory dir)
+    + boolean hasProperParentDirectory()
 }
 
 class File {
     - int size
-    - {static} int MAX_SIZE
-    - boolean writeable
+    - {static} int maximumSize
     - final Filetype type
+    - boolean writeable
 __
     + File(Directory dir, String name, float size, boolean writeable, Filetype type)
     + File(Directory dir, String name, Filetype type)
 ..
-    + boolean isWriteable()
-    + boolean canHaveAsSize(int size)
-    + void enlarge(int amountOfBits)
-    + void shorten(int amountOfBits)
+    + void enlarge(int delta)
+    + void shorten(int delta)
+    - void changeSize(int delta)
 ..Getters & setters..
-    + float getSize()
-    + void setSize(int size)
+    + int getSize()
+    - void setSize(int size)
+    + int getMaximumSize()
+    + Filetype getFiletype()
     + Sting getName()
     - void setName(String name)
-    + void setWriteable(boolean writeable)
+    + void setWriteable()
+    + boolean isWriteable()
+..Checkers..
+    + {static} boolean isValidSize(int size)
+    + {static} boolean canHaveAsFiletype(Filetype type)
 ..Overrides..
-    + boolean isDeleteable()
+    + boolean isDeletable()
     + void delete() (destructor)
     + int getTotalDiskUsage()
+    + boolean canHaveAsParent()
 }
 
 enum Filetype {
@@ -58,8 +72,8 @@ enum Filetype {
 }
 
 class Directory {
-    - boolean writeable
     - ArrayList<Item> items
+    - boolean writeable
 __
     + Directory(Directory dir, String name, boolean writeable)
     + Directory(Directory dir, String name)
@@ -74,11 +88,21 @@ __
     + int getIndexOf(Item item)
     + boolean hasAsItem(Item item)
     + void makeRoot()
+    - int getIndexForItem(Item item)
+    - void insertItemAtIndex(int index)
+    + void setWriteable()
+    + boolean isWriteable()
+    + void deleteRecursive()
+..Checkers..
+    + {static} boolean isValidItem(Item item)
+    + boolean hasProperItems()
+    + boolean isRecursivelyDeletable
 .. Overrides ..
-    + boolean canHaveAsName()
-    + boolean isDeleteable()
+    + boolean isValidName(String name)
+    + boolean isDeletable()
     + void delete() (destructor)
     + int getTotalDiskUsage()
+    + boolean canHaveAsParent()
 }
 
 class Link {
@@ -86,12 +110,15 @@ class Link {
 __
     + Link(Directory dir, String name, Filetype type)
 ..
-    + void changeLinkTo(Link link)
+    - void changeLinkTo(Link link)
     + void unlink()
+..Checkers..
+    + {static} boolean isValidLinkedItem(Item item)
+    + boolean hasProperLinkedItem()
 ..Overrides..
-    + boolean isDeleteable()
     + void delete() (destructor)
     + int getTotalDiskUsage()
+    + boolean canHaveAsParent()
 }
 
 Item <|-- Link: inherits from
@@ -101,7 +128,8 @@ Item <|-- Directory: inherits from
 File .. Filetype: uses
 
 Link --> File: references
-Link --> Directory: references
+Link "*" -- "1" Directory
+File "*" -- "1" Directory
 
 }
 
