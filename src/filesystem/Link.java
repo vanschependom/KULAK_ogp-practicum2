@@ -4,8 +4,14 @@ import be.kuleuven.cs.som.annotate.*;
 
 /**
  * A class of links, inheriting from the class of items, within a filesystem.
+ *
  * @invar   The linked item must be valid.
  *          | isValidLinkedItem(getLinkedItem())
+ *
+ * @author  Vincent Van Schependom
+ * @author  Flor De Meulemeester
+ * @author  Arne Claerhout
+ * @version 2.0
  */
 public class Link extends Item {
 
@@ -28,9 +34,13 @@ public class Link extends Item {
      *          | setLinkedItem(linkedItem)
      */
     @Raw
-    public Link(String name, Directory dir, Item linkedItem) {
+    public Link(String name, Directory dir, Item linkedItem) throws RuntimeException {
         super(name, dir);
-        setLinkedItem(linkedItem);
+        if (!isValidLinkedItem(linkedItem))
+            // todo change exception
+            throw new RuntimeException();
+        // set the final variable
+        this.linkedItem = linkedItem;
     }
 
     /**********************************************************
@@ -39,28 +49,16 @@ public class Link extends Item {
 
     /**
      * A variable referencing the item which the link is referring to.
+     * @note    The link cannot be changed over time.
      */
-    private Item linkedItem;
+    private final Item linkedItem;
 
     /**
      * Return the linked item.
      */
-    @Basic
+    @Basic @Immutable
     public Item getLinkedItem() {
         return linkedItem;
-    }
-
-    /**
-     * Sets the linked item to the given item.
-     * @param   item
-     *          The item which the link needs to refer to.
-     */
-    @Basic @Raw
-    private void setLinkedItem(Item item) {
-        if (isValidLinkedItem(item)){
-            linkedItem = item;
-        }
-        // TODO gooi expection (of anders implementeren?)
     }
 
     /**
@@ -89,12 +87,9 @@ public class Link extends Item {
         return isValidLinkedItem(getLinkedItem());
     }
 
-    /**
-     * TODO
-     */
-    public void unlink(){
+    // I don't think we need unlink() since a link can be invalid.
 
-    }
+
 
     /**********************************************************
      * Overrides
