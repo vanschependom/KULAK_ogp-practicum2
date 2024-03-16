@@ -1,14 +1,13 @@
 package filesystem;
 
-import be.kuleuven.cs.som.annotate.Basic;
-import be.kuleuven.cs.som.annotate.Raw;
+import be.kuleuven.cs.som.annotate.*;
 
 /**
  * A class of links, inheriting from the class of items, within a filesystem.
  * @invar   The linked item must be valid.
- *          | isValidLinkedItem(linkedItem)
+ *          | isValidLinkedItem(getLinkedItem())
  */
-public class Link extends Item{
+public class Link extends Item {
 
     /**********************************************************
      * Constructors
@@ -23,12 +22,12 @@ public class Link extends Item{
      *          The parent directory of the new link.
      * @param   linkedItem
      *          The item which the link is referring to.
-     * @effect  The name of the link is set to the given name.
-     * 			If the given name is not valid, a default name is set.
-     *          | setName(name)
-     * @effect  The parent directory is set to the given directory.
-     *          | new.getParentDirectory() == dir
+     * @effect  A new item is initialized with the given name and directory.
+     *          | super(name, dir)
+     * @effect  The linked item is set to the given item.
+     *          | setLinkedItem(linkedItem)
      */
+    @Raw
     public Link(String name, Directory dir, Item linkedItem) {
         super(name, dir);
         setLinkedItem(linkedItem);
@@ -36,9 +35,11 @@ public class Link extends Item{
 
     /**********************************************************
      * linkedItem - defensive?? programming
-     * @note
      **********************************************************/
 
+    /**
+     * A variable referencing the item which the link is referring to.
+     */
     private Item linkedItem;
 
     /**
@@ -51,11 +52,13 @@ public class Link extends Item{
 
     /**
      * Sets the linked item to the given item.
+     * @param   item
+     *          The item which the link needs to refer to.
      */
     @Basic @Raw
-    private void setLinkedItem(Item linkedItem) {
-        if (isValidLinkedItem(linkedItem)){
-            this.linkedItem = linkedItem;
+    private void setLinkedItem(Item item) {
+        if (isValidLinkedItem(item)){
+            linkedItem = item;
         }
         // TODO gooi expection (of anders implementeren?)
     }
@@ -64,15 +67,19 @@ public class Link extends Item{
      * A link must link to a file or a directory (and not another link).
      * So this is a checker to check if the linked item is not another link
      * and that the item isn't the null pointer.
+     *
      * @param   item
      *          The item that will be linked.
      * @return  False if the item is a link
      *          False if the item is null
      *          True if the item isn't a link
-     *          | !(item instanceof Link) && item != null
+     *          | result ==
+     *          |   ( !(item instanceof Link)
+     *          |       && (item != null) )
      */
-    public static boolean isValidLinkedItem(Item item){
-        return !(item instanceof Link) && item != null;
+    public static boolean isValidLinkedItem(Item item) {
+        return !(item instanceof Link)
+                && item != null;
     }
 
     /**
@@ -94,10 +101,10 @@ public class Link extends Item{
      **********************************************************/
 
     /**
-     * TODO
-     * @return
+     * A method for getting the total disk usage of this link, which
+     * is always equal to zero.
      */
-    @Override
+    @Override @Basic @Immutable
     public int getTotalDiskUsage(){
         return 0; // Link doesn't have a disk usage
     }
