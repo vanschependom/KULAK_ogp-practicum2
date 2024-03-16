@@ -34,11 +34,10 @@ public class Link extends Item {
      *          | setLinkedItem(linkedItem)
      */
     @Raw
-    public Link(String name, Directory dir, Item linkedItem) throws RuntimeException {
+    public Link(String name, Directory dir, Item linkedItem) throws IllegalItemException {
         super(name, dir);
         if (!isValidLinkedItem(linkedItem))
-            // todo change exception
-            throw new RuntimeException();
+            throw new IllegalItemException(linkedItem);
         // set the final variable
         this.linkedItem = linkedItem;
     }
@@ -81,14 +80,14 @@ public class Link extends Item {
     }
 
     /**
-     * TODO
+     * Checks whether the link is linking to a legal item.
      */
     public boolean hasProperLinkedItem(){
         return isValidLinkedItem(getLinkedItem());
     }
 
     // I don't think we need unlink() since a link can be invalid.
-
+    // We do need a destructor (overriding the item class)
 
 
     /**********************************************************

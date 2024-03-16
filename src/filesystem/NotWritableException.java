@@ -35,7 +35,7 @@ public class NotWritableException extends RuntimeException {
     public static boolean isValidItem(Item item) {
         return (item != null) &&
                 ((item instanceof File) ||
-                        (item instanceof Folder));
+                        (item instanceof Directory));
     }
 
     /**
