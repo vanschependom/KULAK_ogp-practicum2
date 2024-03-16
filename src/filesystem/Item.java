@@ -381,6 +381,21 @@ public abstract class Item {
         this.diskUsage = diskUsage;
     }
 
+
+
+    /**********************************************************
+     * hierarchy - defensive programming
+     **********************************************************/
+
+    /**
+     * TODO
+     */
+    public void move(Directory dir) {
+        // TODO
+    }
+
+
+
 }
 
 
