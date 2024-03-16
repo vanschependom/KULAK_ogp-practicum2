@@ -42,6 +42,12 @@ public abstract class Item {
      * @effect  The parent directory is set to the given parent directory.
      *          If the given directory is not valid, an exception is thrown.
      *          | setParentDirectory(dir)
+     * @post    The new creation time of this item is initialized to some time during
+     *          constructor execution.
+     *          | (new.getCreationTime().getTime() >= System.currentTimeMillis()) &&
+     *          | (new.getCreationTime().getTime() <= (new System).currentTimeMillis())
+     * @post    The new item has no time of last modification.
+     *          | new.getModificationTime() == null
      *
      * TODO: exception voor illegal directory
      */

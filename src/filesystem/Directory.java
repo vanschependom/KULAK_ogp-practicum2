@@ -17,7 +17,7 @@ import java.util.ArrayList;
  *          |       for each otherItem in Item:
  *          |           if (item != otherItem)
  *          |               item.getName() != otherItem.getName()
- * @invar   The disk-usage of of a directory is always valid.
+ * @invar   The disk-usage of a directory is always valid.
  *          | canHaveAsDiskUsage(getDiskUsage)
  * @author  Vincent Van Schependom
  * @author  Flor De Meulemeester
@@ -40,25 +40,20 @@ public class Directory extends Item {
      * @param   writable
      *          The writability of this directory
      * @effect  The name of the directory is set to the given name.
-     *          TODO: we kunnen dit weglaten en vervangen door super(...)
      * 			If the given name is not valid, a default name is set.
-     *          | setName(name)
+     * 		    The new creation time of this directory is initialized to some time during
+     *          constructor execution.
+     *          The new directory has no time of last modification.
+     *          | super(name, dir)
      * @effect	The writability is set to the given boolean
      * 			| setWritable(writable)
-     * @post    The new creation time of this directory is initialized to some time during
-     *          constructor execution.
-     *          TODO: we kunnen dit weglaten en vervangen door super(...)
-     *          | (new.getCreationTime().getTime() >= System.currentTimeMillis()) &&
-     *          | (new.getCreationTime().getTime() <= (new System).currentTimeMillis())
-     * @post    The new directory has no time of last modification.
-     *          TODO: we kunnen dit weglaten en vervangen door super(...)
-     *          | new.getModificationTime() == null
      * @post    The new directory does not have any contents.
      *          | new.getNbItems() == 0
      */
     @Raw
     public Directory(Directory dir, String name, boolean writable) {
-
+        super(name, dir);
+        this.writable = writable;
     }
 
     /**
