@@ -9,9 +9,8 @@ import java.util.ArrayList;
  * @invar	Each directory must have a valid name.
  * 			| isValidName(getName())
  * @invar   Each directory must have valid contents.
- *          | for each item in Item:
- *          |       item.canHaveAsParent(this)
- * @invar   The contents of the variable items are always ordered.
+ *          | hasProperItems()
+ * @invar   The items in this directory are ordered at all times.
  *          | isOrdered(items)
  * @invar   The names of the contents of a directory are always unique.
  *          | for each item in Item:
@@ -232,6 +231,8 @@ public class Directory extends Item {
      */
     public boolean hasProperItems() {
         // for every item: isValidItem
+        // && item.getParentDirectory() == this
+        // && item.canHaveAsParentDirectory(this)
     }
 
     /**
@@ -264,11 +265,10 @@ public class Directory extends Item {
      * TODO
      */
     @Override
-    public void canHaveAsParentDirectory() {
+    public boolean canHaveAsParentDirectory(Directory dir) {
         // super + zichzelf niet?
         // TODO
     }
-
 
 
 
