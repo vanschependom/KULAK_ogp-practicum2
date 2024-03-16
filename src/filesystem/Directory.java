@@ -116,8 +116,8 @@ public class Directory extends Item {
      * @return	True if the given string is effective, not
      * 			empty and consisting only of letters, digits,
      * 			hyphens and underscores; false otherwise.
-     * 			| result ==
-     * 			|	(name != null) && name.matches("[a-zA-Z_0-9-]+")
+     * 			| result == ( (name != null)
+     * 		    |	&& (name.matches("[a-zA-Z_0-9-]+")) )
      * @note    The name of directories cannot contain dots, as opposed to files.
      */
     @Override
@@ -139,21 +139,27 @@ public class Directory extends Item {
     /**
      * A method for adding an item to a directory
      *
-     * @pre     The item must be valid for this directory
-     *          | isValidItem(item)
-     * @pre     The directory is writable
-     *          | isWritable()
      * @effect  The modification time is set to the current time
      *          | setModificationTime()
      * @post    The item is added to the directory
-     *          | getNbItems() == new.getNbItems() - 1
+     *          | new.getNbItems() == getNbItems() + 1
      * @post    The item is at the correct index so that the directory
-     *          is ordered
-     *          | hasProperItems()
+     *          is ordered.
+     *          | new.hasProperItems()
      * @throws  NotWritableException
-     *          TODO
+     *          The directory is not writable.
+     *          | ! isWritable()
+     * @throws  IllegalArgumentException
+     *          The item is not a valid item in this directory.
+     *          | ! isValidItem(item)
      */
     public void addItem(Item item) throws NotWritableException {
+        if(!isWritable()) {
+            throw new NotWritableException(this);
+        }
+        if(!isValidItem(item)) {
+            throw new IllegalArgumentException("Item is not valid in this directory.");
+        }
         // 1. check if valid:
         // TODO
         // 2. get index for the (valid) item, based on its name:
