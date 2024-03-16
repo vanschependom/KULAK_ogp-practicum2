@@ -262,7 +262,12 @@ public class Directory extends Item {
     }
 
     /**
-     * TODO
+     * Check whether this item can have the given directory as its
+     * parent directory.
+     *
+     * @param   dir
+     *          The directory to check.
+     * @return  TODO
      */
     @Override
     public boolean canHaveAsParentDirectory(Directory dir) {

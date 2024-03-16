@@ -15,7 +15,7 @@ import be.kuleuven.cs.som.annotate.*;
 public class NotWritableException extends RuntimeException {
 
     /**
-     * Required because this class inherits from Exception
+     * Required because this class inherits from Exception.
      */
     private static final long serialVersionUID = 1L;
 
@@ -25,7 +25,7 @@ public class NotWritableException extends RuntimeException {
     private final Item item;
 
     /**
-     * Check whether the fiven item is a valid item for this Exception.
+     * Check whether the given item is a valid item for this Exception.
      * @param 	item
      * 			The item to check
      * @return	| result == (item != null)

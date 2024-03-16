@@ -296,7 +296,7 @@ public abstract class Item {
     }
 
     /**
-     * Check wheter this item can have the given directory as its
+     * Check whether this item can have the given directory as its
      * parent directory.
      *
      * @param   dir
@@ -381,6 +381,15 @@ public abstract class Item {
         this.diskUsage = diskUsage;
     }
 
+    /**
+     * Calculates the total disk usage of an item.
+     * @return  A valid disk usage
+     *          | isValidDiskUsage(result)
+     */
+    public int getTotalDiskUsage(){
+        // TODO
+        // Wordt best ge-override door directory, file and link
+    }
 
 
     /**********************************************************
@@ -394,25 +403,5 @@ public abstract class Item {
         // TODO
     }
 
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

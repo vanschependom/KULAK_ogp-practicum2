@@ -108,7 +108,7 @@ __
 class Link {
     - Item linkedItem (not another link)
 __
-    + Link(Directory dir, String name, Filetype type)
+    + Link(Directory dir, String name, Item linkedItem)
 ..
     - void changeLinkTo(Link link)
     + void unlink()
