@@ -146,6 +146,8 @@ public class Directory extends Item {
      * @post    The item is at the correct index so that the directory
      *          is ordered.
      *          | new.hasProperItems()
+     * @throws  NullPointerException
+     *          The item is null.
      * @throws  NotWritableException
      *          The directory is not writable.
      *          | ! isWritable()
@@ -154,97 +156,130 @@ public class Directory extends Item {
      *          | ! isValidItem(item)
      */
     public void addItem(Item item) throws NotWritableException {
-        if(!isWritable()) {
+        if (item == null) throw new NullPointerException("Item is null.");
+        if (!isWritable()) {
             throw new NotWritableException(this);
         }
-        if(!isValidItem(item)) {
+        if (!isValidItem(item)) {
             throw new IllegalArgumentException("Item is not valid in this directory.");
         }
-        // 1. check if valid:
-        // TODO
-        // 2. get index for the (valid) item, based on its name:
         int index = getIndexForItem(item);
-        // 3. insert item at the right index so that the ordering is kept:
         insertItemAtIndex(index, item);
-        // NOTE: no order() method needed this way (much more overhead)
+        setModificationTime();
     }
 
     /**
      * A method for checking the index of a certain item
      *
-     * @pre     The item must be in the directory
-     *          | hasAsItem(item)
-     * @return  The index of this item
-     *          | result == indexOf(item)
+     * @return  The index of this item based on the lexigraphical order within the directory.
+     *          | (items.getItemAt(result-1).getName().compareTo(item.getName()) < 0)
+     *          |   && (items.getItemAt(result+1).getName().compareTo(item.getName()) > 0)
+     * @throws  IllegalArgumentException
+     *          The item is not in the directory
+     *          | ! hasAsItem(item)
      */
     private int getIndexForItem(Item item) {
-        // TODO
+        if (!hasAsItem(item)) {
+            throw new IllegalArgumentException("Item is not in directory.");
+        }
+        // get the index based on the lexigraphical order
+        int index = 0;
+        for (Item otherItem : items) {
+            if (otherItem.getName().compareTo(item.getName()) < 0) {
+                index++;
+            }
+        }
+        return index;
     }
 
     /**
-     * A method for inserting an item at a given index
-     *TODO
-     * @pre     The item must be valid in this directory
-     *          | isValidItem(item)
-     * @pre     The index must be valid for this item
-     * //TODO
-     *          | new.isOrdered()
+     * A method for inserting an item at a given index.
      *
-     * @pre     The directory is writable
-     *          | isWritable()
+     * @param   index
+     *          The index at which the item should be inserted.
+     * @param   item
+     *          The item to be inserted.
      * @post    The item is inserted at the given index
-     *          | items.add(index, item)
-     *          TODO
+     *          | items.getItemAt(index) == item
+     * @effect  The modification time is set to the current time
+     *          | setModificationTime()
+     * @throws  NullPointerException
+     *          The item is null.
+     *          | item == null
+     * @throws  NotWritableException
+     *          The directory is not writable
+     *          | ! isWritable()
+     * @throws  IllegalItemException
+     *          The item is not a valid item in this directory
+     *          | ! isValidItem(item)
+     * @throws  IllegalIndexException
+     *          The index is not a valid index for this directory
+     *          | ! isValidIndex(index, item)
      */
-    private void insertItemAtIndex(int index, Item item) throws NotWritableException, IllegalItemException, IllegalIndexException {
+    private void insertItemAtIndex(int index, Item item) throws NullPointerException, NotWritableException, IllegalItemException, IllegalIndexException {
+        if(item == null) throw new NullPointerException("Item is null.");
         if(!isWritable()) throw new NotWritableException(this);
         if(!isValidItem(item)) throw new IllegalItemException(item);
         if(!isValidIndex(index, item)) throw new IllegalIndexException();
         items.add(index, item);
+        setModificationTime();
     }
 
     /**
      * A method for getting an item with a given name
      *
-     * @return  The item with the given name.
+     * @return  The item with the given name is returned, if it is present in the directory.
      *          | result.getName().equals(name)
-     *          TODO dit klopt denk ik niet
+     * @throws  IllegalArgumentException
+     *          The name is not valid.
+     *          | ! isValidName(name)
      * @throws  IllegalArgumentException
      *          There is no item with the given name in the directory.
      *          | ! containsDiskItemWithName(name)
      */
-    public Item getItem(String name) throws IllegalArgumentException{
-        // TODO
+    public Item getItem(String name) throws NullPointerException, IllegalArgumentException {
+        if (!isValidName(name)) throw new IllegalArgumentException("Name is not valid.");
+        if (!containsDiskItemWithName(name)) {
+            throw new IllegalArgumentException("No item with the given name in the directory.");
+        }
+        for (Item item : items) {
+            if (item.getName().equals(name)) {
+                return item;
+            }
+        }
+        throw new IllegalArgumentException("No item with the given name in the directory.");
     }
 
     /**
      * A method for getting an item with a given index
      *
-     * @pre     The given index must be a positive integer (including zero)
-     *          smaller than the size of items.
-     *          | index >= 0 && index < getNbOfItems()
      * @return  The item with a given index is returned.
      *          | result == items.get(index)
      * @throws  IndexOutOfBoundsException
      *          If the index is not between the given bounds.
+     *          | ! isValidIndex(index)
      */
     public Item getItemAt(int index) throws IndexOutOfBoundsException {
-        if (isValidIndex(index)) return items.get(index);
-        throw new IndexOutOfBoundsException();
+        if(!isValidIndex(index)) {
+            throw new IndexOutOfBoundsException("Index is not valid.");
+        }
+        return items.get(index);
     }
 
     /**
      * A method for getting the index of an item.
      *
-     * @pre     The item must be an item in the directory
-     *          | hasAsItem(item)
-     * @return  The index of the given item in items.
-     *          | items.indexOf(item)
+     * @return  The index of the given item in item, if it is present in the directory.
+     *          | result == items.indexOf(item)
+     * @throws  NullPointerException
+     *          The item is null.
+     *          | item == null
      * @throws  IllegalArgumentException
      *          The item is not in the directory.
      *          | ! hasAsItem(item)
      */
     public int getIndexOf(Item item) throws IllegalArgumentException {
+        if (item == null) throw new NullPointerException("Item is null.");
         if (!hasAsItem(item)) {
             throw new IllegalArgumentException("Item is not in directory.");
         }
@@ -270,8 +305,14 @@ public class Directory extends Item {
      *
      * @return  True if the item is present, false otherwise
      *          | result == items.contains(item)
+     * @throws  NullPointerException
+     *          The item is null.
+     *          | item == null
      */
     public boolean hasAsItem(Item item) {
+        if (item == null) {
+            throw new NullPointerException("Item is null.");
+        }
         return items.contains(item);
     }
 
@@ -279,21 +320,23 @@ public class Directory extends Item {
      * A method for checking if a directory contains a given item.
      *
      * @return  True if a given name is present in items, false otherwise
+     *          | result == ( for some item in items:
+     *          |   item.getName().equals(name) )
+     * @throws  IllegalArgumentException
+     *          The name is not valid.
+     *          | ! isValidName(name)
      */
-    public Boolean containsDiskItemWithName(String name) {
+    public Boolean containsDiskItemWithName(String name) throws IllegalArgumentException {
         try {
             getItem(name);
-        } catch (ItemNotInDirectoryException a) {
+        } catch (ItemNotInDirectoryException exc) {
             return false;
         }
         return true;
     }
 
     /**
-     * A method for checking the size of items
-     *
-     * @return  The size of items
-     *          | items.size()
+     * A method for getting the number of items in a directory.
      */
     public int getNbOfItems() {
         return items.size();
@@ -302,12 +345,19 @@ public class Directory extends Item {
     /**
      * A method for checking if an item is valid in a directory
      *
-     * @return  True if the item can have this directory as its parent
-     *          directory, false otherwise
-     *          | result == canHaveAsParentDirectory(this)
+     * @return  True if the item is not null, if the item is not already in the directory,
+     *          if the name of the item is not already present in the directory,
+     *          and if the item can have this directory as its parent directory.
+     *          | result == ( (item != null)
+     *          |   && !hasAsItem(item)
+     *          |   && !containsDiskItemWithName(item.getName())
+     *          |   && item.canHaveAsParentDirectory(this) )
      */
     public boolean isValidItem(Item item) {
-        return item.canHaveAsParentDirectory(this);
+        return (item != null)
+                && !hasAsItem(item)
+                && !containsDiskItemWithName(item.getName())
+                && item.canHaveAsParentDirectory(this);
     }
 
     /**
@@ -317,39 +367,37 @@ public class Directory extends Item {
      *          has this directory as the parent directory
      *          and can have this directory as the parent directory.
      *          Still true if items is ordered, false otherwise.
-     *          | for each item in items:
-     *          |   isValidItem(item) && item.getParentDirectory() == this &&
-     *          |   item.canHaveAsParentDirectory(this)
-     *          | isOrdered()
-     *          TODO dit klopt niet helemaal
+     *          | result == ( for each item in items:
+     *          |               isValidItem(item)
+     *          |               && (item.getParentDirectory() == this) )
+     *          |           && ( isOrdered() )
      */
     public boolean hasProperItems() {
         for (Item item : items) {
-            if (!isValidItem(item) || item.getParentDirectory() != this || !item.canHaveAsParentDirectory(this))
+            if ( !isValidItem(item) || item.getParentDirectory() != this ) {
                 return false;
+            }
         }
         return isOrdered();
     }
 
     /**
      * A method for checking if a directory is ordered lexicographically.
-     * TODO
-     *          | for each otherItem with an index smaller than index:
-     *          |       (item.getName()).compareTo(otherItem.getName()) > 0
-     *          | for each otherItem with an index equal to or bigger than index:
-     *          |       (item.getName()).compareTo(otherItem.getName()) < 0
+     *
+     * @return  True if the items in the directory are ordered lexicographically.
+     *         | result == ( for each item in items:
+     *         |               item.getName().compareTo(getItemAt(getIndexOf(item)+1).getName()) < 0 )
+     *         |           && ( for each item in items:
+     *         |               item.getName().compareTo(getItemAt(getIndexOf(item)-1).getName()) > 0 )
      */
     public boolean isOrdered() {
-        //TODO
-        // ik dacht eerder aan zoiets
-        for (int i = 1; i < getNbOfItems(); i++) {
-            if ((items.get(i-1).getName()).compareTo(items.get(i).getName()) >= 0) return false;
-        }
-        return true;
-
-        // zoiets?
         for (Item item : items) {
-            if ( getItemAt((getIndexOf(item))) != item ) {
+            if (item.getName().compareTo(getItemAt(getIndexOf(item)+1).getName()) < 0) {
+                return false;
+            }
+        }
+        for (Item item : items) {
+            if (item.getName().compareTo(getItemAt(getIndexOf(item)-1).getName()) > 0) {
                 return false;
             }
         }
@@ -381,12 +429,12 @@ public class Directory extends Item {
      * @return  True if adding dir to this directory would not create a loop
      *          and if there is no other item in the parent directory
      *          with the same name as this directory
-     *          | !dir.getAbsolutePath().contains(getName()) &&
-     *          |   dir.containsDiskItemWithName(getName())
+     *          | result == ( ! dir.getAbsolutePath().contains(getName())
+     *          |   && dir.containsDiskItemWithName(getName()) )
      */
     @Override
     public boolean canHaveAsParentDirectory(Directory dir) {
-        return !dir.getAbsolutePath().contains(getName()) && dir.containsDiskItemWithName(getName());
+        // TODO dit klopte niet echt
     }
 
 
