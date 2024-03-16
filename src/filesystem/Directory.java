@@ -17,10 +17,8 @@ import java.util.ArrayList;
  *          |       for each otherItem in Item:
  *          |           if (item != otherItem)
  *          |               item.getName() != otherItem.getName()
- * @invar   The disk-usage of the contents of a directory are always valid.
- *          TODO: ik zou dit gewoon aanpassen naar 1 variabele diskusage die we altijd aanpassen per item dat wordt toegevoegd
- *          | for each item in Item:
- *          |       item.isValidDiskUsage(item.getDiskUsage())
+ * @invar   The disk-usage of of a directory is always valid.
+ *          | canHaveAsDiskUsage(getDiskUsage)
  * @author  Vincent Van Schependom
  * @author  Flor De Meulemeester
  * @author  Arne Claerhout
@@ -282,6 +280,35 @@ public class Directory extends Item {
      **********************************************************/
 
     // TODO zorgen dat bij elke nieuwe file de diskUsage wordt aangepast
+
+    /**
+     * A method for checking if the disk usage of this directory is valid.
+     * @param   nbOfBytes
+     *          The amount of bytes (size) to check.
+     * @return  True if the given number of bytes is positive and if this
+     *          number is equal to the sum of all disk usages of every item
+     *          in this directory.
+     *          | result ==
+     *          |    ( nbOfBytes >= 0 ) &&
+     *          |    ( nbOfBytes == getSumOfDiskUsages() )
+     */
+    public boolean canHaveAsDiskUsage(int nbOfBytes) {
+        return (nbOfBytes >= 0) && (nbOfBytes == getSumOfDiskUsages());
+    }
+
+    /**
+     * A method for calculating the som of all disk usages of the items in this directory.
+     * @return  The sum of all disk usages of the items in this directory.
+     *          | TODO
+     */
+    @Model
+    private int getSumOfDiskUsages() {
+        int sum = 0;
+        for (Item item : items) {
+            sum += item.getTotalDiskUsage();
+        }
+        return sum;
+    }
 
 
 }
