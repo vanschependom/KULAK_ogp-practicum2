@@ -42,18 +42,21 @@ public class Link extends Item {
         this.linkedItem = linkedItem;
     }
 
+
+
     /**********************************************************
-     * linkedItem - defensive?? programming
+     * linkedItem - defensive programming
      **********************************************************/
 
     /**
      * A variable referencing the item which the link is referring to.
      * @note    The link cannot be changed over time.
+     *          It is thus marked as final.
      */
     private final Item linkedItem;
 
     /**
-     * Return the linked item.
+     * A method for getting the linked item of this link.
      */
     @Basic @Immutable
     public Item getLinkedItem() {

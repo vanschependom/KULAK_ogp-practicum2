@@ -12,7 +12,7 @@ import java.util.ArrayList;
  *          | hasProperItems()
  * @invar   The items in this directory are ordered at all times.
  *          | isOrdered(items)
- * @invar   The names of the contents of a directory are always unique.
+ * @invar   The names of the items in a directory must always be unique.
  *          | for each item in Item:
  *          |       for each otherItem in Item:
  *          |           if (item != otherItem)
@@ -39,11 +39,7 @@ public class Directory extends Item {
      *          The name for this directory
      * @param   writable
      *          The writability of this directory
-     * @effect  The name of the directory is set to the given name.
-     * 			If the given name is not valid, a default name is set.
-     * 		    The new creation time of this directory is initialized to some time during
-     *          constructor execution.
-     *          The new directory has no time of last modification.
+     * @effect  A new item is initialized with the given name and parent directory.
      *          | super(name, dir)
      * @effect	The writability is set to the given boolean
      * 			| setWritable(writable)
@@ -53,7 +49,7 @@ public class Directory extends Item {
     @Raw
     public Directory(Directory dir, String name, boolean writable) {
         super(name, dir);
-        this.writable = writable;
+        setWritable(writable);
     }
 
     /**
@@ -63,8 +59,8 @@ public class Directory extends Item {
      *          The parent directory for this directory
      * @param   name
      *          The name for this directory
-     * @effect  The parent directory is set to the given directory and the name is set to the given name,
-     *          the writability is set to true
+     * @effect  A directory is initialized with the given name and parent directory,
+     *          the writability is set to true.
      *          | this(dir, name, true)
      */
     @Raw
@@ -79,10 +75,12 @@ public class Directory extends Item {
      *          The name for this directory
      * @param   writable
      *          The writability of this directory
-     * @effect  The directory is set as a root directory, the name is set to the given name,
-     *          the writability is set to the given writability
+     * @effect  A directory is initialized with the given name and writability.
      *          | this(null, name, true)
+     * @effect  The directory is set as a root directory, i.e. the directory
+     *          doesn't have a parent directory.
      *          | makeRoot()
+     *          |   && this.getParentDirectory() == null
      */
     @Raw
     public Directory(String name, boolean writable) {
@@ -95,15 +93,13 @@ public class Directory extends Item {
      *
      * @param   name
      *          The name for this directory
-     * @effect  The directory is set as a root directory, the name is set to the given name,
-     *          the writability is set to the default value true
+     * @effect  A directory is initialized with the given name, with no parent directory,
+     *          and the writability is set to true.
      *          | this(null, name, true)
-     *          | makeRoot()
      */
     @Raw
     public Directory(String name) {
         this(null, name, true);
-        this.makeRoot();
     }
 
 
@@ -133,8 +129,6 @@ public class Directory extends Item {
 
     /**********************************************************
      * items in this directory - defensive programming
-     * @note    Ik zou geen order items doen, maar elke keer de ordering op orde
-     *          houden wanneer we een item toevoegen.
      **********************************************************/
 
     /**
@@ -165,7 +159,7 @@ public class Directory extends Item {
         // 2. get index for the (valid) item, based on its name:
         int index = getIndexForItem(item);
         // 3. insert item at the right index so that the ordering is kept:
-        insertItemAtIndex(index);
+        insertItemAtIndex(index, item);
         // NOTE: no order() method needed this way (much more overhead)
     }
 
@@ -196,31 +190,24 @@ public class Directory extends Item {
      *          | items.add(index, item)
      *          TODO
      */
-    private void insertItemAtIndex(int index, Item item) throws NotWritableException, IllegalItemException, IllegalIndexException{
-        if (isWritable()) {
-            if (isValidItem(item)) {
-                if (isValidIndex(index, item)) {
-                    items.add(index, item);
-                } else throw new IllegalIndexException();
-            } else throw new IllegalItemException(item);
-        } else throw new NotWritableException(this);
+    private void insertItemAtIndex(int index, Item item) throws NotWritableException, IllegalItemException, IllegalIndexException {
+        if(!isWritable()) throw new NotWritableException(this);
+        if(!isValidItem(item)) throw new IllegalItemException(item);
+        if(!isValidIndex(index, item)) throw new IllegalIndexException();
+        items.add(index, item);
     }
 
     /**
      * A method for getting an item with a given name
      *
-     * @pre     The given name must be valid
-     *          | isValidName(name)
-     * @pre     There exists an item with the given name in the directory
-     *          | TODO
-     * @return  The item with the given name
-     *          | item.getName() = name
-     *          | result == item
+     * @return  The item with the given name.
+     *          | result.getName().equals(name)
      *          TODO dit klopt denk ik niet
-     * @throws  ItemNotInDirectoryException
-     *          When there is no item in items with the given name
+     * @throws  IllegalArgumentException
+     *          There is no item with the given name in the directory.
+     *          | ! containsDiskItemWithName(name)
      */
-    public Item getItem(String name) throws ItemNotInDirectoryException{
+    public Item getItem(String name) throws IllegalArgumentException{
         // TODO
     }
 
@@ -236,7 +223,7 @@ public class Directory extends Item {
      *          If the index is not between the given bounds.
      */
     public Item getItemAt(int index) throws IndexOutOfBoundsException {
-        if (index >= 0 && index < getNbOfItems()) return items.get(index);
+        if (isValidIndex(index)) return items.get(index);
         throw new IndexOutOfBoundsException();
     }
 
@@ -248,11 +235,28 @@ public class Directory extends Item {
      * @return  The index of the given item in items.
      *          | items.indexOf(item)
      * @throws  IllegalArgumentException
-     *          If the item is not present in items
+     *          The item is not in the directory.
+     *          | ! hasAsItem(item)
      */
-    public int getIndexOf(Item item) throws IllegalArgumentException{
-        if (hasAsItem(item)) return items.indexOf(item);
-        throw new ItemNotInDirectoryException();
+    public int getIndexOf(Item item) throws IllegalArgumentException {
+        if (!hasAsItem(item)) {
+            throw new IllegalArgumentException("Item is not in directory.");
+        }
+        return items.indexOf(item);
+    }
+
+    /**
+     * A method for checking if an index is a valid index for
+     * accessing an item in items.
+     * @param   index
+     *          The index to check.
+     * @return  True if the index is a positive integer (including zero)
+     *          and smaller than the size of items.
+     *          | result == ( (index >= 0)
+     *          |   && (index < getNbOfItems()) )
+     */
+    public boolean isValidIndex(int index) {
+        return index >= 0 && index < getNbOfItems();
     }
 
     /**
@@ -416,11 +420,38 @@ public class Directory extends Item {
         return sum;
     }
 
+
+
     /**********************************************************
-     * Writability - defensive programming
+     * writable - defensive programming
      **********************************************************/
 
-    //TODO
+    /**
+     * Variable registering whether this file is writable.
+     */
+    private boolean isWritable = true;
+
+    /**
+     * Check whether this file is writable.
+     */
+    @Basic
+    public boolean isWritable() {
+        return isWritable;
+    }
+
+    /**
+     * Set the writability of this file to the given writability.
+     *
+     * @param isWritable
+     *        The new writability
+     * @post  The given writability is registered as the new writability
+     *        for this file.
+     *        | new.isWritable() == isWritable
+     */
+    @Raw
+    public void setWritable(boolean isWritable) {
+        this.isWritable = isWritable;
+    }
 
 
 }
