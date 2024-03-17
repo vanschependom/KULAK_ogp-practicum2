@@ -473,28 +473,21 @@ public class Directory extends Item {
     }
 
     /**
-     * Check whether this item can have the given directory as its
+     * Check whether this directory can have the given directory as its
      * parent directory.
      *
      * @param   dir
      *          The directory to check.
-     * @return  If the given directory is null, true, otherwise
-     *          if the given directory is not null, true if
-     *          the directory can be the parent directory
+     * @return  True if the directory can be the parent directory
      *          of an item and if no loops wil be created.
-     *          | if (dir == null):
-     *          |   result == true
-     *          | else:
-     *          |   result == ( super.canHaveAsParentDirectory(dir)
-     *          |       && !isDirectOrIndirectChildOf(dir) )
+     *          | result == ( super.canHaveAsParentDirectory(dir)
+     *          |  && !isDirectOrIndirectChildOf(dir) )
      */
     @Override
     public boolean canHaveAsParentDirectory(Directory dir) {
-        if (dir != null && !super.canHaveAsParentDirectory(dir)) {
-            return false;
-        }
-        // check if there are no loops
-        return !isDirectOrIndirectChildOf(dir);
+        return ( super.canHaveAsParentDirectory(dir) )
+                // check for loops
+                && ( !isDirectOrIndirectChildOf(dir) );
     }
 
 
