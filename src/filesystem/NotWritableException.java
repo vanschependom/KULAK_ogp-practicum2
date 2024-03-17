@@ -49,6 +49,10 @@ public class NotWritableException extends RuntimeException {
      * @post	The item involved in the new not writable exception
      * 			is set to the given item.
      * 			| new.getItem() == item
+     * @effect  This new illegal amount exception is further
+     *          initialized as a new runtime exception involving no
+     *          diagnostic message and no cause.
+     *          | super()
      */
     public NotWritableException(Item item) {
         this.item = item;
@@ -58,7 +62,7 @@ public class NotWritableException extends RuntimeException {
      * Return the item involved in this file not writable exception.
      */
     @Basic @Immutable
-    public File getItem() {
+    public Item getItem() {
         return item;
     }
 

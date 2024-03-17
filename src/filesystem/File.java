@@ -72,7 +72,19 @@ public class File extends Item {
 
     // todo less extended constructors die de meest geextende constructor aanroepen
 
+    /**********************************************************
+     * Destructors
+     **********************************************************/
 
+    /**
+     * TODO
+     */
+    @Override
+    public void terminate(){
+        if (isWritable && !isTerminated){
+            // TODO
+        }
+    }
 
     /**********************************************************
      * size - nominal programming

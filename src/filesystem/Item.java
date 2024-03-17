@@ -61,7 +61,21 @@ public abstract class Item {
         setName(name);
     }
 
+    /**********************************************************
+     * Destructors
+     **********************************************************/
 
+    /**
+     * A variable to check whether the item is terminated or not.
+     */
+    protected boolean isTerminated;
+
+    /**
+     * TODO
+     */
+    public void terminate(){
+        // gets overridden
+    }
 
     /**********************************************************
      * name - total programming

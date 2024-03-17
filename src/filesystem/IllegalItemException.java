@@ -1,6 +1,6 @@
 package filesystem;
 
-import be.kuleuven.cs.som.annotate.Basic;
+import be.kuleuven.cs.som.annotate.*;
 
 /**
  * A class for signaling illegal attempts to link with an invalid item.
@@ -40,7 +40,7 @@ public class IllegalItemException extends RuntimeException {
     /**
      * Return the item of this illegal item exception.
      */
-    @Basic
+    @Basic @Immutable
     public Item getItem(){
         return item;
     }

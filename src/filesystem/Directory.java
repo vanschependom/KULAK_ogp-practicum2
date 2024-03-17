@@ -102,7 +102,19 @@ public class Directory extends Item {
         this(null, name, true);
     }
 
+    /**********************************************************
+     * Destructors
+     **********************************************************/
 
+    /**
+     * TODO
+     */
+    @Override
+    public void terminate(){
+        if (items.isEmpty() && !isTerminated){
+            // TODO
+        }
+    }
 
     /**********************************************************
      * name - total programming

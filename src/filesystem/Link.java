@@ -42,7 +42,21 @@ public class Link extends Item {
         this.linkedItem = linkedItem;
     }
 
+    /**********************************************************
+     * Destructors
+     **********************************************************/
 
+    /**
+     * Break the connection with the linked item.
+     * @post    The linked item is set to null
+     *          | getLinkedItem == null
+     */
+    @Override @Immutable
+    public void terminate(){
+        // TODO
+        // als linked item final is kunnen we het niet meer veranderen
+        // dus mss toch niet final maken
+    }
 
     /**********************************************************
      * linkedItem - defensive programming
@@ -89,9 +103,16 @@ public class Link extends Item {
         return isValidLinkedItem(getLinkedItem());
     }
 
-    // I don't think we need unlink() since a link can be invalid.
-    // We do need a destructor (overriding the item class)
-
+    /**
+     * Changes the linked item to the new item.
+     * @param   item
+     *          The new linked item
+     * @note This is a help function for the terminator
+     */
+    @Raw
+    private void changeLinkTo(Item item){
+        // this.linkedItem = item;
+    }
 
     /**********************************************************
      * Overrides
