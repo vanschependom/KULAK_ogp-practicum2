@@ -371,7 +371,8 @@ public abstract class Item {
      * @param   dir
      *          The directory to check.
      * @return  True if the given directory is a direct or indirect parent of this item.
-     *          | result == (dir == getParentDirectory()) || isDirectOrIndirectChildOf(dir.getParentDirectory())
+     *          | result == ( dir != null && (dir == getParentDirectory())
+     *          |   || isDirectOrIndirectChildOf(dir.getParentDirectory()) )
      */
     public boolean isDirectOrIndirectChildOf(Directory dir) {
         if (dir == null) return false;

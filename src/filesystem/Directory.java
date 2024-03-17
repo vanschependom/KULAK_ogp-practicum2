@@ -162,32 +162,20 @@ public class Directory extends Item {
      * @post    The item is at the correct index so that the directory
      *          is ordered.
      *          | new.hasProperItems()
-     * @throws  NullPointerException
-     *          The item is null.
-     *          | item == null
      * @throws  NotWritableException
      *          The directory is not writable.
      *          | ! isWritable()
      * @throws  IllegalItemException
-     *          The item is not a valid item in this directory.
-     *          | ! isValidItem(item)
-     * @throws  IllegalArgumentException
-     *          The item already has a parent directory.
-     *          | item.getParentDirectory() != null
+     *          The item is not a valid item to be added this directory.
+     *          | ! isAddableItem(item)
      */
     public void addItem(Item item) throws
             NullPointerException, NotWritableException, IllegalItemException, IllegalArgumentException {
-        if (item == null) {
-            throw new NullPointerException("Item is null.");
-        }
         if (!isWritable()) {
             throw new NotWritableException(this);
         }
-        if (!isValidItem(item)) {
+        if (!isAddableItem(item)) {
             throw new IllegalItemException(item);
-        }
-        if (item.getParentDirectory() != null) {
-            throw new IllegalArgumentException("Item already has a parent directory.");
         }
         int index = getIndexForItem(item);
         insertItemAtIndex(index, item);
@@ -228,28 +216,27 @@ public class Directory extends Item {
      *          The item to be inserted.
      * @post    The item is inserted at the given index
      *          | items.getItemAt(index) == item
-     * @effect  The modification time is set to the current time
-     *          | setModificationTime()
-     * @throws  NullPointerException
-     *          The item is null.
-     *          | item == null
      * @throws  NotWritableException
      *          The directory is not writable
      *          | ! isWritable()
      * @throws  IllegalItemException
-     *          The item is not a valid item in this directory
-     *          | ! isValidItem(item)
-     * @throws  IllegalIndexException
+     *          The item is not a valid item to be added to this directory
+     *          | ! isAddableItem(item)
+     * @throws  IndexOutOfBoundsException
      *          The index is not a valid index for this directory
      *          | ! canHaveAsIndex(index)
      */
-    private void insertItemAtIndex(int index, Item item) throws NullPointerException, NotWritableException, IllegalItemException, IllegalIndexException {
-        if(item == null) throw new NullPointerException("Item is null.");
-        if(!isWritable()) throw new NotWritableException(this);
-        if(!isValidItem(item)) throw new IllegalItemException(item);
-        if(!canHaveAsIndex(index)) throw new IllegalIndexException();
+    private void insertItemAtIndex(int index, Item item) throws NotWritableException, IllegalItemException, IllegalIndexException {
+        if(!isWritable()) {
+            throw new NotWritableException(this);
+        }
+        if(!isAddableItem(item)) {
+            throw new IllegalItemException(item);
+        }
+        if(!canHaveAsIndex(index)) {
+            throw new IndexOutOfBoundsException();
+        }
         items.add(index, item);
-        setModificationTime();
     }
 
     /**
@@ -401,17 +388,24 @@ public class Directory extends Item {
     /**
      * A method for checking if an item is valid in a directory
      *
-     * @return  True if the item is not null, if the item is not already in the directory,
-     *          if the name of the item is not already present in the directory,
-     *          and if the item can have this directory as its parent directory.
-     *          | result == ( (item != null)
-     *          |   && !hasAsItem(item)
-     *          |   && !containsDiskItemWithNameCaseSensitive(item.getName())
-     *          |   && item.canHaveAsParentDirectory(this) )
+     * @return  TODO
      */
-    public boolean isValidItem(Item item) {
+    public boolean canHaveAsItem(Item item) {
+        return (item != null)
+                && item.getParentDirectory() == this;
+    }
+
+    /**
+     * A method for checking if a given item can be added as an item within this directory.
+     *
+     * @param   item
+     *          The item to check
+     * @return  TODO
+     */
+    public boolean isAddableItem(Item item) {
         return (item != null)
                 && !hasAsItem(item)
+                && item.getParentDirectory() == null
                 && !containsDiskItemWithNameCaseSensitive(item.getName())
                 && item.canHaveAsParentDirectory(this);
     }
@@ -424,13 +418,12 @@ public class Directory extends Item {
      *          and can have this directory as the parent directory.
      *          Still true if items is ordered, false otherwise.
      *          | result == ( for each item in items:
-     *          |               isValidItem(item)
-     *          |               && (item.getParentDirectory() == this) )
+     *          |               canHaveAsItem(item) )
      *          |           && ( isOrdered() )
      */
     public boolean hasProperItems() {
         for (Item item : items) {
-            if ( !isValidItem(item) || item.getParentDirectory() != this ) {
+            if ( !canHaveAsItem(item) ) {
                 return false;
             }
         }
@@ -471,9 +464,12 @@ public class Directory extends Item {
      *
      * @effect  The parent directory is set to null
      *          | setParentDirectory(null)
+     * @effect  The modification time is set to the current time
+     *          | setModificationTime()
      */
     public void makeRoot() {
         setParentDirectory(null);
+        setModificationTime();
     }
 
     /**
