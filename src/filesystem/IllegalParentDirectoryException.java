@@ -27,7 +27,7 @@ public class IllegalParentDirectoryException extends RuntimeException {
      * @param   directory
      *          The directory for this new illegal parent directory exception.
      * @post    The directory of this new illegal parent directory exception is equal to the directory given.
-     *          | new.getDirectory() = directory
+     *          | new.getDirectory() == directory
      * @effect  This new illegal parent directory exception is further
      *          initialized as a new runtime exception involving no
      *          diagnostic message and no cause.

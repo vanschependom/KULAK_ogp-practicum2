@@ -7,7 +7,7 @@ import java.util.ArrayList;
 /**
  * A class of directories, inheriting from the class Item, within a filesystem
  * @invar	Each directory must have a valid name.
- * 			| isValidName(getName())
+ * 	        | isValidName(getName())
  * @invar   Each directory must have valid contents.
  *          | hasProperItems()
  * @invar   The items in this directory are ordered at all times.
@@ -109,11 +109,20 @@ public class Directory extends Item {
      **********************************************************/
 
     /**
-     * TODO
+     * A destructor for this directory.
+     *
+     * @effect  The destructor for the superclass Item is called.
+     *          | super.delete()
+     * @throws  DirectoryNotEmptyException
+     *          The directory is not empty.
+     *          | getNbOfItems() != 0
      */
     @Override
-    public void delete(){
-        // TODO
+    public void delete() throws DirectoryNotEmptyException {
+        if (getNbOfItems() != 0) {
+            throw new DirectoryNotEmptyException(this);
+        }
+        super.delete();
     }
 
 
@@ -449,6 +458,22 @@ public class Directory extends Item {
             }
         }
         return true;
+    }
+
+    /**
+     * A method for removing an item from a directory.
+     *
+     * @param   item
+     *          The item to be removed.
+     * @throws  IllegalItemException
+     *          The item is not valid.
+     *          | ! hasAsItem(item)
+     */
+    protected void removeAsItem(Item item) throws NullPointerException, IllegalItemException {
+        if (!hasAsItem(item)) {
+            throw new IllegalItemException(item);
+        }
+        items.remove(item);
     }
 
 

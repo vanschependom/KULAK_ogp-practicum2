@@ -71,11 +71,27 @@ public abstract class Item {
     protected boolean isDeleted;
 
     /**
-     * A method for deleting this item.
-     * TODO
+     * A destructor for this item.
+     *
+     * @effect  If this item is not yet deleted and
+     *          the parent directory is effective, this item is removed
+     *          from that parent directory and the parent directory of this
+     *          item is set to null.
+     *          | if getParentDirectory != null
+     *          |   getParentDirectory().removeAsItem(this)
+     *          |   && setParentDirectory(null)
+     * @post    If this item is not yet deleted, isDeleted
+     *          is set to true.
+     *          | new.isDeleted() == true
      */
     public void delete(){
-        setParentDirectory(null);
+        if (!isDeleted()) {
+            isDeleted = true;
+            if (getParentDirectory() != null) {
+                getParentDirectory().removeAsItem(this);
+                setParentDirectory(null);
+            }
+        }
     }
 
     /**
@@ -445,10 +461,18 @@ public abstract class Item {
      **********************************************************/
 
     /**
-     * TODO
+     * A method for moving this item.
+     *
+     * @param   dir
+     *          The directory to move the item to.
      */
-    public void move(Directory dir) {
-        // TODO
+    public void move(Directory dir) throws IllegalParentDirectoryException {
+        if (!canHaveAsParentDirectory(dir) || !dir.isAddableItem(this)) {
+            throw new IllegalParentDirectoryException(dir);
+        }
+        getParentDirectory().removeAsItem(this);
+        dir.addItem(this);
+        setParentDirectory(null);
     }
 
 }

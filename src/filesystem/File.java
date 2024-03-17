@@ -92,7 +92,10 @@ public class File extends Item {
      **********************************************************/
 
     /**
-     * TODO
+     * A destructor for this file.
+     *
+     * @effect  The destructor for the superclass is called.
+     *          | super.delete()
      */
     @Override
     public void delete(){
