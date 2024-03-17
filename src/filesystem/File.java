@@ -43,9 +43,7 @@ public class File extends Item {
      * @effect	The writability is set to the given flag
      * 			| setWritable(writable)
      * @effect  The parent directory is set to the given directory.
-     *          | new.getParentDirectory() == dir
-     * @post    The disk usage is set to the filesize.
-     *          | new.getDiskUsage() == size
+     *          | setParentDirectory(dir)
      * @post    The new creation time of this file is initialized to some time during
      *          constructor execution.
      *          | (new.getCreationTime().getTime() >= System.currentTimeMillis()) &&
@@ -64,12 +62,14 @@ public class File extends Item {
         if (!isValidFileType(type)) {
             throw new IllegalArgumentException("This is not a valid file type.");
         }
+        // final variable must be initialized this way
         fileType = type;
         setWritable(writable);
-        setDiskUsage(size);
+        setSize(size); // this also sets the disk usage
     }
 
     /**
+     * Initialize a new file with a given parent directory, given name and given file type.
      *
      * @param   dir
      *          The parent directory of the new file.
@@ -78,18 +78,14 @@ public class File extends Item {
      * @param   type
      *          The type of the new file.
      * @effect  This new file is initialized with the given parent directory, the given name,
-     *          a zero size, true writablity and a given file type.
+     *          a size of 0 bytes, a writablity of true and the given file type.
      *          | this(dir, name, 0, true, type)
-     * @throws  IllegalParentDirectoryException
-     *          The provided parent directory is not a valid parent directory.
-     *          | ! canHaveAsParentDirectory(dir)
-     * @throws  IllegalArgumentException
-     *          The provided file type is not a valid type.
-     *          | !isValidFIleType()
      */
     public File(Directory dir, String name, FileType type) throws IllegalParentDirectoryException, IllegalArgumentException {
         this(dir, name, 0, true, type);
     }
+
+
 
     /**********************************************************
      * Destructors
@@ -100,10 +96,12 @@ public class File extends Item {
      */
     @Override
     public void terminate(){
-        if (isWritable && !isTerminated){
+        if (isWritable() && !isTerminated()){
             // TODO
         }
     }
+
+
 
     /**********************************************************
      * size - nominal programming
@@ -135,12 +133,15 @@ public class File extends Item {
      *         The new size for this file.
      * @pre    The given size must be legal.
      *         | isValidSize(size)
+     * @effect The disk usage is set to the valid filesize.
+     *         | setDiskUsage(size)
      * @post   The given size is registered as the size of this file.
      *         | new.getSize() == size
      */
     @Raw @Model
     private void setSize(int size) {
         this.size = size;
+        setDiskUsage(size);
     }
 
     /**
@@ -256,8 +257,7 @@ public class File extends Item {
 
 
     /**********************************************************
-     * filetype - ??nominal?? programming
-     * todo: wat is het type programming? ik denk dat we mogen kiezen
+     * filetype
      **********************************************************/
 
     /**
@@ -300,6 +300,8 @@ public class File extends Item {
      * @throws  NotWritableException
      *          This file is not writable.
      *          | ! isWritable()
+     * @note    This needs to be overriden because the superclass doesn't
+     *          have an implementation for writability.
      */
     @Override
     public void changeName(String name) throws NotWritableException {

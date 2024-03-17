@@ -71,10 +71,18 @@ public abstract class Item {
     protected boolean isTerminated;
 
     /**
+     * A method for terminating this item.
      * TODO
      */
     public void terminate(){
         setParentDirectory(null);
+    }
+
+    /**
+     * A method for checking if this item is terminated.
+     */
+    public boolean isTerminated() {
+        return isTerminated;
     }
 
 
