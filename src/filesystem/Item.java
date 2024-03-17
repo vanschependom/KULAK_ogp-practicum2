@@ -56,8 +56,6 @@ public abstract class Item {
     @Raw
     public Item(String name, Directory dir) throws IllegalParentDirectoryException {
         setName(name);
-        // TODO dit is een oplossing maar ik vind zelf dat dit niet mooi is
-        if (dir == null && this instanceof Directory) ((Directory) this).setRoot();
         setParentDirectory(dir);
     }
 
@@ -353,7 +351,10 @@ public abstract class Item {
      */
     public boolean canHaveAsParentDirectory(Directory dir) {
         // the name must not be taken
-        return !dir.containsDiskItemWithNameCaseSensitive(getName());
+        if (dir.containsDiskItemWithNameCaseSensitive(getName())) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -466,7 +467,7 @@ public abstract class Item {
      *          The directory to move the item to.
      */
     public void move(Directory dir) throws IllegalParentDirectoryException {
-        if (!canHaveAsParentDirectory(dir) || !dir.canHaveAsItem(this)) {
+        if (!canHaveAsParentDirectory(dir) || !dir.isAddableItem(this)) {
             throw new IllegalParentDirectoryException(dir);
         }
         getParentDirectory().removeAsItem(this);
@@ -475,4 +476,3 @@ public abstract class Item {
     }
 
 }
-
