@@ -85,7 +85,7 @@ public class Directory extends Item {
     @Raw
     public Directory(String name, boolean writable) {
         this(null, name, writable);
-        this.makeRoot();
+        this.setRoot();
     }
 
     /**
@@ -116,13 +116,69 @@ public class Directory extends Item {
      * @throws  DirectoryNotEmptyException
      *          The directory is not empty.
      *          | getNbOfItems() != 0
+     * @throws  NotWritableException
+     *          The directory is not writable
+     *          | ! isWritable()
+     *
      */
     @Override
-    public void delete() throws DirectoryNotEmptyException {
+    public void delete() throws DirectoryNotEmptyException, NotWritableException {
         if (getNbOfItems() != 0) {
             throw new DirectoryNotEmptyException(this);
         }
+        if (!isWritable()) throw new NotWritableException(this);
         super.delete();
+    }
+
+    /* TODO staat in klassendiagram maar wordt nergens gebruikt, staat ook nog niet in Item als we het wel zouden implementeren
+    /**
+     * A method for checking if a directory is deletable.
+     *
+     * @return  True if the number of items of the directory is zero
+     *          and the directory is writable, false otherwise.
+     *          | result == (getNbOfItems() == 0) && isWritable()
+     *
+    @Override
+    public boolean isDeletable() {
+        return (getNbOfItems() == 0) && isWritable();
+    }
+    */
+
+
+
+    /**
+     * A method for deleting a directory recursively
+     *
+     * @post    The directory and its contents are deleted
+     *          | for each item in items:
+     *          |       item.delete()
+     *          | delete()
+     * @throws  NotWritableException
+     *          When the directory is not recursively deletable
+     *          because a file or directory within is not writable
+     *          | ! isRecursivelyDeletable()
+     */
+    public void deleteRecursive() throws NotWritableException {
+        if (!isRecursivelyDeletable()) throw new NotWritableException(this);
+        for (Item item : items) {
+            if (item instanceof Directory) ((Directory) item).deleteRecursive();
+            else item.delete();
+        }
+        super.delete();
+    }
+
+    /**
+     * A method for checking if a directory is recursively deletable
+     *
+     * @return  True if the directory is deletable
+     *          | TODO
+     */
+    public boolean isRecursivelyDeletable() {
+        for (Item item : items) {
+            if ((item instanceof Directory && !((Directory) item).isRecursivelyDeletable()) ||
+                    (item instanceof File && !((File) item).isWritable())) return false;
+        }
+        return true;
     }
 
 
@@ -174,14 +230,14 @@ public class Directory extends Item {
      *          | ! isWritable()
      * @throws  IllegalItemException
      *          The item is not a valid item to be added this directory.
-     *          | ! isAddableItem(item)
+     *          | ! canHaveAsItem(item)
      */
     public void addItem(Item item) throws
             NullPointerException, NotWritableException, IllegalItemException, IllegalArgumentException {
         if (!isWritable()) {
             throw new NotWritableException(this);
         }
-        if (!isAddableItem(item)) {
+        if (!canHaveAsItem(item)) {
             throw new IllegalItemException(item);
         }
         int index = getIndexForItem(item);
@@ -228,7 +284,7 @@ public class Directory extends Item {
      *          | ! isWritable()
      * @throws  IllegalItemException
      *          The item is not a valid item to be added to this directory
-     *          | ! isAddableItem(item)
+     *          | ! canHaveAsItem(item)
      * @throws  IndexOutOfBoundsException
      *          The index is not a valid index for this directory
      *          | ! canHaveAsIndex(index)
@@ -237,7 +293,7 @@ public class Directory extends Item {
         if(!isWritable()) {
             throw new NotWritableException(this);
         }
-        if(!isAddableItem(item)) {
+        if(!canHaveAsItem(item)) {
             throw new IllegalItemException(item);
         }
         if(!canHaveAsIndex(index)) {
@@ -392,15 +448,6 @@ public class Directory extends Item {
         return items.size();
     }
 
-    /**
-     * A method for checking if an item is valid in a directory
-     *
-     * @return  TODO
-     */
-    public boolean canHaveAsItem(Item item) {
-        return (item != null)
-                && item.getParentDirectory() == this;
-    }
 
     /**
      * A method for checking if a given item can be added as an item within this directory.
@@ -409,7 +456,7 @@ public class Directory extends Item {
      *          The item to check
      * @return  TODO
      */
-    public boolean isAddableItem(Item item) {
+    public boolean canHaveAsItem(Item item) {
         return (item != null)
                 && !hasAsItem(item)
                 && item.getParentDirectory() == null
@@ -482,6 +529,8 @@ public class Directory extends Item {
      * parent directory - defensive programming
      **********************************************************/
 
+    private boolean isRoot = false;
+
     /**
      * A method for making a directory a root directory
      *
@@ -491,7 +540,7 @@ public class Directory extends Item {
      *          | setModificationTime()
      */
     public void makeRoot() {
-        setParentDirectory(null);
+        setRoot();
         setModificationTime();
     }
 
@@ -502,17 +551,41 @@ public class Directory extends Item {
      * @param   dir
      *          The directory to check.
      * @return  True if the directory can be the parent directory
-     *          of an item and if no loops wil be created.
+     *          of an item and if no loops wil be created
+     *          or if the given directory is a null pointer and this directory is a root.
      *          | result == ( super.canHaveAsParentDirectory(dir)
      *          |  && !isDirectOrIndirectChildOf(dir) )
+     *          |  || ( (dir == null) && isRoot() )
      */
     @Override
     public boolean canHaveAsParentDirectory(Directory dir) {
-        return ( super.canHaveAsParentDirectory(dir) )
+        return (dir == null && isRoot()) || (( super.canHaveAsParentDirectory(dir) )
                 // check for loops
-                && ( !isDirectOrIndirectChildOf(dir) );
+                && ( !isDirectOrIndirectChildOf(dir) ));
     }
 
+    /**
+     * A method for setting the directory as a root
+     *
+     * @effect  The parent directory is set to null.
+     *          | setParentDirectory(null)
+     * @post    The directory is set as a root directory.
+     *          | new.isRoot()
+     */
+    protected void setRoot() {
+        setParentDirectory(null);
+        this.isRoot = true;
+    }
+
+    /**
+     * A method for checking if a directory is a root
+     *
+     * @return  True if the directory is a root, false otherwise.
+     *          | result == this.isRoot
+     */
+    public boolean isRoot() {
+        return isRoot;
+    }
 
 
     /**********************************************************
