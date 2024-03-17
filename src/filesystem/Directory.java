@@ -102,6 +102,8 @@ public class Directory extends Item {
         this(null, name, true);
     }
 
+
+
     /**********************************************************
      * Destructors
      **********************************************************/
@@ -115,6 +117,8 @@ public class Directory extends Item {
             // TODO
         }
     }
+
+
 
     /**********************************************************
      * name - total programming
@@ -160,24 +164,35 @@ public class Directory extends Item {
      *          | new.hasProperItems()
      * @throws  NullPointerException
      *          The item is null.
+     *          | item == null
      * @throws  NotWritableException
      *          The directory is not writable.
      *          | ! isWritable()
-     * @throws  IllegalArgumentException
+     * @throws  IllegalItemException
      *          The item is not a valid item in this directory.
      *          | ! isValidItem(item)
+     * @throws  IllegalArgumentException
+     *          The item already has a parent directory.
+     *          | item.getParentDirectory() != null
      */
-    public void addItem(Item item) throws NotWritableException {
-        if (item == null) throw new NullPointerException("Item is null.");
+    public void addItem(Item item) throws
+            NullPointerException, NotWritableException, IllegalItemException, IllegalArgumentException {
+        if (item == null) {
+            throw new NullPointerException("Item is null.");
+        }
         if (!isWritable()) {
             throw new NotWritableException(this);
         }
         if (!isValidItem(item)) {
-            throw new IllegalArgumentException("Item is not valid in this directory.");
+            throw new IllegalItemException(item);
+        }
+        if (item.getParentDirectory() != null) {
+            throw new IllegalArgumentException("Item already has a parent directory.");
         }
         int index = getIndexForItem(item);
         insertItemAtIndex(index, item);
         setModificationTime();
+        changeDiskUsageBy(item.getTotalDiskUsage());
     }
 
     /**
@@ -226,13 +241,13 @@ public class Directory extends Item {
      *          | ! isValidItem(item)
      * @throws  IllegalIndexException
      *          The index is not a valid index for this directory
-     *          | ! isValidIndex(index, item)
+     *          | ! canHaveAsIndex(index)
      */
     private void insertItemAtIndex(int index, Item item) throws NullPointerException, NotWritableException, IllegalItemException, IllegalIndexException {
         if(item == null) throw new NullPointerException("Item is null.");
         if(!isWritable()) throw new NotWritableException(this);
         if(!isValidItem(item)) throw new IllegalItemException(item);
-        if(!isValidIndex(index, item)) throw new IllegalIndexException();
+        if(!canHaveAsIndex(index)) throw new IllegalIndexException();
         items.add(index, item);
         setModificationTime();
     }
@@ -247,11 +262,11 @@ public class Directory extends Item {
      *          | ! isValidName(name)
      * @throws  IllegalArgumentException
      *          There is no item with the given name in the directory.
-     *          | ! containsDiskItemWithName(name)
+     *          | ! containsDiskItemWithNameCaseSensitive(name)
      */
-    public Item getItem(String name) throws NullPointerException, IllegalArgumentException {
+    public Item getItem(String name) throws IllegalArgumentException {
         if (!isValidName(name)) throw new IllegalArgumentException("Name is not valid.");
-        if (!containsDiskItemWithName(name)) {
+        if (!containsDiskItemWithNameCaseSensitive(name)) {
             throw new IllegalArgumentException("No item with the given name in the directory.");
         }
         for (Item item : items) {
@@ -269,10 +284,10 @@ public class Directory extends Item {
      *          | result == items.get(index)
      * @throws  IndexOutOfBoundsException
      *          If the index is not between the given bounds.
-     *          | ! isValidIndex(index)
+     *          | ! canHaveAsIndex(index)
      */
     public Item getItemAt(int index) throws IndexOutOfBoundsException {
-        if(!isValidIndex(index)) {
+        if (!canHaveAsIndex(index)) {
             throw new IndexOutOfBoundsException("Index is not valid.");
         }
         return items.get(index);
@@ -290,7 +305,7 @@ public class Directory extends Item {
      *          The item is not in the directory.
      *          | ! hasAsItem(item)
      */
-    public int getIndexOf(Item item) throws IllegalArgumentException {
+    public int getIndexOf(Item item) throws NullPointerException, IllegalArgumentException {
         if (item == null) throw new NullPointerException("Item is null.");
         if (!hasAsItem(item)) {
             throw new IllegalArgumentException("Item is not in directory.");
@@ -308,7 +323,7 @@ public class Directory extends Item {
      *          | result == ( (index >= 0)
      *          |   && (index < getNbOfItems()) )
      */
-    public boolean isValidIndex(int index) {
+    public boolean canHaveAsIndex(int index) {
         return index >= 0 && index < getNbOfItems();
     }
 
@@ -329,22 +344,51 @@ public class Directory extends Item {
     }
 
     /**
-     * A method for checking if a directory contains a given item.
+     * A method for checking if a directory contains a given item with a name,
+     * regardless of the case of the letters.
      *
-     * @return  True if a given name is present in items, false otherwise
+     * @return  True if a given name is present in items, false otherwise.
+     *          Lowercase and uppercase letters are considered equal.
+     *          | result == ( for some item in items:
+     *          |   item.getName().equalsIgnoreCase(name) )
+     * @throws  IllegalArgumentException
+     *          The name is not valid.
+     *          | ! isValidName(name)
+     */
+    public Boolean containsDiskItemWithName(String name) throws IllegalArgumentException {
+        if (!isValidName(name)) {
+            throw new IllegalArgumentException("Name is not valid.");
+        }
+        for (Item item : items) {
+            if (item.getName().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * A method for checking if a directory contains a given item with a name,
+     * where the case of the letters matters.
+     *
+     * @return  True if a given name is present in items, false otherwise.
+     *          Lowercase and uppercase letters are considered equal.
      *          | result == ( for some item in items:
      *          |   item.getName().equals(name) )
      * @throws  IllegalArgumentException
      *          The name is not valid.
      *          | ! isValidName(name)
      */
-    public Boolean containsDiskItemWithName(String name) throws IllegalArgumentException {
-        try {
-            getItem(name);
-        } catch (ItemNotInDirectoryException exc) {
-            return false;
+    public Boolean containsDiskItemWithNameCaseSensitive(String name) throws IllegalArgumentException {
+        if (!isValidName(name)) {
+            throw new IllegalArgumentException("Name is not valid.");
         }
-        return true;
+        for (Item item : items) {
+            if (item.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -362,13 +406,13 @@ public class Directory extends Item {
      *          and if the item can have this directory as its parent directory.
      *          | result == ( (item != null)
      *          |   && !hasAsItem(item)
-     *          |   && !containsDiskItemWithName(item.getName())
+     *          |   && !containsDiskItemWithNameCaseSensitive(item.getName())
      *          |   && item.canHaveAsParentDirectory(this) )
      */
     public boolean isValidItem(Item item) {
         return (item != null)
                 && !hasAsItem(item)
-                && !containsDiskItemWithName(item.getName())
+                && !containsDiskItemWithNameCaseSensitive(item.getName())
                 && item.canHaveAsParentDirectory(this);
     }
 
@@ -438,15 +482,23 @@ public class Directory extends Item {
      *
      * @param   dir
      *          The directory to check.
-     * @return  True if adding dir to this directory would not create a loop
-     *          and if there is no other item in the parent directory
-     *          with the same name as this directory
-     *          | result == ( ! dir.getAbsolutePath().contains(getName())
-     *          |   && dir.containsDiskItemWithName(getName()) )
+     * @return  If the given directory is null, true, otherwise
+     *          if the given directory is not null, true if
+     *          the directory can be the parent directory
+     *          of an item and if no loops wil be created.
+     *          | if (dir == null):
+     *          |   result == true
+     *          | else:
+     *          |   result == ( super.canHaveAsParentDirectory(dir)
+     *          |       && !isDirectOrIndirectChildOf(dir) )
      */
     @Override
     public boolean canHaveAsParentDirectory(Directory dir) {
-        // TODO dit klopte niet echt
+        if (dir != null && !super.canHaveAsParentDirectory(dir)) {
+            return false;
+        }
+        // check if there are no loops
+        return !isDirectOrIndirectChildOf(dir);
     }
 
 
@@ -455,7 +507,23 @@ public class Directory extends Item {
      * disk usage - nominal programming
      **********************************************************/
 
-    // TODO zorgen dat bij elke nieuwe file de diskUsage wordt aangepast
+    /**
+     * @note variable diskUsage and getter getDiskUsage() are inherited from Item.
+     */
+
+    /**
+     * A method for incrementing or decrementing the disk usage of this directory.
+     *
+     * @param   delta
+     *          The number of bytes to change the disk usage by.
+     *          This can be a positive or negative number.
+     * @effect  The disk usage is set to the current disk usage, increased with
+     *          the given delta (positive or negative).
+     *          | setDiskUsage(getDiskUsage() + delta);
+     */
+    private void changeDiskUsageBy(int delta) {
+        setDiskUsage(getTotalDiskUsage() + delta);
+    }
 
     /**
      * A method for checking if the disk usage of this directory is valid.

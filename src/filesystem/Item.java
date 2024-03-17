@@ -17,7 +17,7 @@ import java.lang.String;
  * @invar   Each item must have a valid parent directory.
  *          | hasProperParentDirectory();
  * @invar   Each item must have a valid disk usage.
- *          | isValidDiskUsage(getDiskUsage());
+ *          | isValidDiskUsage(getTotalDiskUsage());
  *
  * @author  Vincent Van Schependom
  * @author  Flor De Meulemeester
@@ -325,7 +325,10 @@ public abstract class Item {
      * @return  TODO
      */
     public boolean canHaveAsParentDirectory(Directory dir) {
-        // TODO
+        // the directory must not be null
+        if (dir == null) return false;
+        // the name must not be taken
+        if (dir.containsDiskItemWithNameCaseSensitive(getName())) return false;
     }
 
     /**
@@ -361,6 +364,21 @@ public abstract class Item {
         return canHaveAsParentDirectory(getParentDirectory());
     }
 
+    /**
+     * A recursive method for checking if this item is a direct or indirect
+     * child of the given directory.
+     *
+     * @param   dir
+     *          The directory to check.
+     * @return  True if the given directory is a direct or indirect parent of this item.
+     *          | result == (dir == getParentDirectory()) || isDirectOrIndirectChildOf(dir.getParentDirectory())
+     */
+    public boolean isDirectOrIndirectChildOf(Directory dir) {
+        if (dir == null) return false;
+        if (dir == getParentDirectory()) return true;
+        return isDirectOrIndirectChildOf(dir.getParentDirectory());
+    }
+
 
 
     /**********************************************************
@@ -376,7 +394,7 @@ public abstract class Item {
      * Return the disk usage of this item.
      */
     @Basic
-    public int getDiskUsage() {
+    public int getTotalDiskUsage() {
         return diskUsage;
     }
 
@@ -388,7 +406,7 @@ public abstract class Item {
      * @return  True if the given amount of bits is positive or equal to zero.
      *          | result == (amtOfBits >= 0)
      */
-    public static boolean isValidDiskUsage(int amtOfBits) {
+    public boolean isValidDiskUsage(int amtOfBits) {
         return (amtOfBits >= 0);
     }
 
@@ -404,16 +422,6 @@ public abstract class Item {
      */
     void setDiskUsage(int diskUsage) {
         this.diskUsage = diskUsage;
-    }
-
-    /**
-     * Calculates the total disk usage of an item.
-     * @return  A valid disk usage
-     *          | isValidDiskUsage(result)
-     */
-    public int getTotalDiskUsage(){
-        // TODO
-        // Wordt best ge-override door directory, file and link
     }
 
 
