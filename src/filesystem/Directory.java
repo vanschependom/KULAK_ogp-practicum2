@@ -559,9 +559,9 @@ public class Directory extends Item {
      */
     @Override
     public boolean canHaveAsParentDirectory(Directory dir) {
-        return ( super.canHaveAsParentDirectory(dir) )
+        return (dir == null) || (( super.canHaveAsParentDirectory(dir) )
                 // check for loops
-                && ( !isDirectOrIndirectChildOf(dir) );
+                && ( !isDirectOrIndirectChildOf(dir) ));
     }
 
 
