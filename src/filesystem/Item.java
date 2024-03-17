@@ -32,6 +32,7 @@ public abstract class Item {
 
     /**
      * Initialize a new item with given name and parentDirectory.
+     *
      * @param   name
      *          The name of the new item.
      * @param   dir
@@ -58,9 +59,7 @@ public abstract class Item {
         setParentDirectory(dir);
     }
 
-    public Item(String name) {
-        setName(name);
-    }
+
 
     /**********************************************************
      * Destructors
@@ -75,8 +74,10 @@ public abstract class Item {
      * TODO
      */
     public void terminate(){
-        // gets overridden
+        setParentDirectory(null);
     }
+
+
 
     /**********************************************************
      * name - total programming
@@ -159,7 +160,7 @@ public abstract class Item {
      * 			| if (isValidName(name) && isWritable())
      *          | then setName(name)
      * @effect  If the name is valid, the modification time
-     * 			of this file is updated.
+     * 			of this item is updated.
      *          | if (isValidName(name))
      *          | then setModificationTime()
      */
@@ -201,8 +202,8 @@ public abstract class Item {
      *         	| 	(date.getTime() <= System.currentTimeMillis())
      */
     public static boolean isValidCreationTime(Date date) {
-        return 	(date!=null) &&
-                (date.getTime()<=System.currentTimeMillis());
+        return 	(date != null) &&
+                (date.getTime() <= System.currentTimeMillis());
     }
 
 
@@ -219,7 +220,7 @@ public abstract class Item {
 
     /**
      * Return the time at which this item was last modified.
-     * If this file has not yet been modified after construction,
+     * If this item has not yet been modified after construction,
      * null is returned.
      */
     @Raw @Basic
@@ -325,23 +326,25 @@ public abstract class Item {
      * @return  TODO
      */
     public boolean canHaveAsParentDirectory(Directory dir) {
-        // the directory must not be null
-        if (dir == null) return false;
         // the name must not be taken
-        if (dir.containsDiskItemWithNameCaseSensitive(getName())) return false;
+        if (dir.containsDiskItemWithNameCaseSensitive(getName())) {
+            return false;
+        }
+        return true;
     }
 
     /**
      * Set the parent directory of this item to the given directory <dir>.
+     *
      * @param   dir
      *          The directory we want the parent directory to be set to.
      * @post    If the given directory is valid as parent directory then the new parent
      *          directory is set to dir.
      *          | if canHaveAsParentDirectory(dir)
-     *          |   parentDirectory = dir
+     *          |   new.getParentDirectory() == dir
      * @throws  IllegalParentDirectoryException
      *          The provided parent directory is not a valid parent directory
-     *          | !canHaveAsParentDirectory
+     *          | ! canHaveAsParentDirectory(dir)
      * @note    This is package private because children need to access it.
      */
     @Model
@@ -357,7 +360,8 @@ public abstract class Item {
      * A checker for the class invariant stating that the parent directory
      * must be legal at all times.
      *
-     * @return  TODO
+     * @return  True if and only if the parent directory is a legal parent directory.
+     *          | result == canHaveAsParentDirectory(getParentDirectory())
      */
     @Model
     private boolean hasProperParentDirectory() {
@@ -413,11 +417,13 @@ public abstract class Item {
 
     /**
      * Set the disk usage of this item.
+     *
      * @param   diskUsage
      *          The number to set the disk usage to.
      * @pre     The diskUsage to be set must be valid.
      *          | isValidDiskUsage()
      * @post    The diskUsage of this item is set to the given amount of bits.
+     *
      * @note    We implemented this nominally, so we expect a legal value.
      * @note    This is package private, since children must be able to call this method.
      */
