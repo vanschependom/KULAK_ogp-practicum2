@@ -112,10 +112,8 @@ public class Directory extends Item {
      * TODO
      */
     @Override
-    public void terminate(){
-        if (items.isEmpty() && !isTerminated){
-            // TODO
-        }
+    public void delete(){
+        // TODO
     }
 
 
@@ -226,7 +224,7 @@ public class Directory extends Item {
      *          The index is not a valid index for this directory
      *          | ! canHaveAsIndex(index)
      */
-    private void insertItemAtIndex(int index, Item item) throws NotWritableException, IllegalItemException, IllegalIndexException {
+    private void insertItemAtIndex(int index, Item item) throws NotWritableException, IllegalItemException, IndexOutOfBoundsException {
         if(!isWritable()) {
             throw new NotWritableException(this);
         }

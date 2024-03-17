@@ -53,8 +53,8 @@ public class Link extends Item {
      * @post    The linked item is set to null
      *          | getLinkedItem == null
      */
-    @Override @Immutable
-    public void terminate(){
+    @Override
+    public void delete(){
         // TODO
         // als linked item final is kunnen we het niet meer veranderen
         // dus mss toch niet final maken
@@ -123,6 +123,22 @@ public class Link extends Item {
     /**********************************************************
      * parent directory - defensive programming
      **********************************************************/
+
+    /**
+     * Check whether this link can have the given directory as its
+     * parent directory.
+     *
+     * @param   dir
+     *          The directory to check.
+     * @return  True if the given directory is effective and
+     *          if the directory can be the parent directory of an item.
+     *          | result == ( (dir != null)
+     *          |          && (super.canHaveAsParentDirectory(dir)) )
+     */
+    @Override
+    public boolean canHaveAsParentDirectory(Directory dir) {
+        return (dir != null) && (super.canHaveAsParentDirectory(dir));
+    }
 
     /**
      * A method for checking if this link has a proper parent directory.

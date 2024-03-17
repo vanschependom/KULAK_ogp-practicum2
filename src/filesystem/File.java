@@ -95,9 +95,8 @@ public class File extends Item {
      * TODO
      */
     @Override
-    public void terminate(){
-        super.terminate();
-        // TODO
+    public void delete(){
+        super.delete();
     }
 
 

@@ -66,23 +66,23 @@ public abstract class Item {
      **********************************************************/
 
     /**
-     * A variable to check whether the item is terminated or not.
+     * A variable to check whether the item is deleted or not.
      */
-    protected boolean isTerminated;
+    protected boolean isDeleted;
 
     /**
-     * A method for terminating this item.
+     * A method for deleting this item.
      * TODO
      */
-    public void terminate(){
+    public void delete(){
         setParentDirectory(null);
     }
 
     /**
-     * A method for checking if this item is terminated.
+     * A method for checking if this item is deleted.
      */
-    public boolean isTerminated() {
-        return isTerminated;
+    public boolean isDeleted() {
+        return isDeleted;
     }
 
 
