@@ -372,7 +372,7 @@ public abstract class Item {
      *          | result == canHaveAsParentDirectory(getParentDirectory())
      */
     @Model
-    private boolean hasProperParentDirectory() {
+    public boolean hasProperParentDirectory() {
         return canHaveAsParentDirectory(getParentDirectory());
     }
 

@@ -96,9 +96,8 @@ public class File extends Item {
      */
     @Override
     public void terminate(){
-        if (isWritable() && !isTerminated()){
-            // TODO
-        }
+        super.terminate();
+        // TODO
     }
 
 
@@ -310,6 +309,27 @@ public class File extends Item {
         } else {
             throw new NotWritableException(this);
         }
+    }
+
+
+
+    /**********************************************************
+     * parent directory - defensive programming
+     **********************************************************/
+
+    /**
+     * A method for checking if this file has a proper parent directory.
+     *
+     * @return  True if and only if the parent directory is not null
+     *          and satisfies the hasProperParentDirectory() method
+     *          of the superclass.
+     *          | result == ( (getParentDirectory() != null)
+     *          |               && super.hasProperParentDirectory() )
+     */
+    @Override
+    public boolean hasProperParentDirectory() {
+        return (getParentDirectory() != null)
+            && (super.hasProperParentDirectory());
     }
 
 }

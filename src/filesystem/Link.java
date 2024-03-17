@@ -42,6 +42,8 @@ public class Link extends Item {
         this.linkedItem = linkedItem;
     }
 
+
+
     /**********************************************************
      * Destructors
      **********************************************************/
@@ -57,6 +59,8 @@ public class Link extends Item {
         // als linked item final is kunnen we het niet meer veranderen
         // dus mss toch niet final maken
     }
+
+
 
     /**********************************************************
      * linkedItem - defensive programming
@@ -114,17 +118,25 @@ public class Link extends Item {
         // this.linkedItem = item;
     }
 
+
+
     /**********************************************************
-     * Overrides
+     * parent directory - defensive programming
      **********************************************************/
 
     /**
-     * A method for getting the total disk usage of this link, which
-     * is always equal to zero.
+     * A method for checking if this link has a proper parent directory.
+     *
+     * @return  True if and only if the parent directory is not null
+     *          and satisfies the hasProperParentDirectory() method
+     *          of the superclass.
+     *          | result == ( (getParentDirectory() != null)
+     *          |               && super.hasProperParentDirectory() )
      */
-    @Override @Basic @Immutable
-    public int getTotalDiskUsage(){
-        return 0; // Link doesn't have a disk usage
+    @Override
+    public boolean hasProperParentDirectory() {
+        return (getParentDirectory() != null)
+                && (super.hasProperParentDirectory());
     }
 
 }
