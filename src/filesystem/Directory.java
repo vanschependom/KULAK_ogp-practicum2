@@ -109,11 +109,71 @@ public class Directory extends Item {
      **********************************************************/
 
     /**
-     * TODO
+     * A method for deleting a directory
+     *
+     * @throws  NotDeletableException
+     *          When the directory is not deletable
+     *          | ! isDeletable()
      */
     @Override
-    public void delete(){
-        // TODO
+    public void delete() throws NotDeletableException{
+        if (!isWritable()) throw new NotDeletableException("Not writable");
+        if (!isDeletable()) throw new NotDeletableException("Has contents");
+        this.isDeleted = true;
+    }
+
+    /**
+     * A method for deleting an item out of a directory
+     *
+     * @param item
+     *        The item to be deleted
+     */
+    protected void deleteItem(Item item) {
+        items.remove(item);
+    }
+
+    /**
+     * A method for checking if a directory is deletable.
+     *
+     * @return  True if the number of items of the directory is zero
+     *          and the directory is writable, false otherwise.
+     *          | result == (getNbOfItems() == 0) && isWritable()
+     */
+    public boolean isDeletable() {
+        return (getNbOfItems() == 0) && isWritable();
+    }
+
+    /**
+     * A method for deleting a directory recursively
+     *
+     * @post    The directory and its contents are deleted
+     *          | for each item in items:
+     *          |       item.delete()
+     *          | delete()
+     * @throws  NotWritableException
+     *          When the directory is not recursively deletable
+     *          | ! isRecursivelyDeletable()
+     */
+    public void deleteRecursive() throws NotWritableException {
+        if (!isRecursivelyDeletable()) throw new NotWritableException(this);
+        for (Item item : items) {
+            if (item instanceof Directory) ((Directory) item).deleteRecursive();
+            else item.delete();
+        }
+        delete();
+    }
+
+    /**
+     * A method for checking if a directory is recursively deletable
+     *
+     * @return
+     */
+    public boolean isRecursivelyDeletable() {
+        for (Item item : items) {
+            if ((item instanceof Directory && !((Directory) item).isRecursivelyDeletable()) ||
+                    (item instanceof File && !((File) item).isWritable())) return false;
+        }
+        return true;
     }
 
 
@@ -384,16 +444,6 @@ public class Directory extends Item {
     }
 
     /**
-     * A method for checking if an item is valid in a directory
-     *
-     * @return  TODO
-     */
-    public boolean canHaveAsItem(Item item) {
-        return (item != null)
-                && item.getParentDirectory() == this;
-    }
-
-    /**
      * A method for checking if a given item can be added as an item within this directory.
      *
      * @param   item
@@ -416,12 +466,12 @@ public class Directory extends Item {
      *          and can have this directory as the parent directory.
      *          Still true if items is ordered, false otherwise.
      *          | result == ( for each item in items:
-     *          |               canHaveAsItem(item) )
+     *          |               isAddableItem(item) )
      *          |           && ( isOrdered() )
      */
     public boolean hasProperItems() {
         for (Item item : items) {
-            if ( !canHaveAsItem(item) ) {
+            if ( !isAddableItem(item) ) {
                 return false;
             }
         }
@@ -524,21 +574,23 @@ public class Directory extends Item {
      *          |    ( nbOfBytes == getSumOfDiskUsages() )
      */
     public boolean canHaveAsDiskUsage(int nbOfBytes) {
-        return (nbOfBytes >= 0) && (nbOfBytes == getSumOfDiskUsages());
+        return (nbOfBytes >= 0) && (nbOfBytes == getTotalDiskUsage());
     }
 
     /**
-     * A method for calculating the som of all disk usages of the items in this directory.
+     * A method for calculating the sum of all disk usages of the items in this directory.
+     *
      * @return  The sum of all disk usages of the items in this directory.
-     *          | TODO
+     *          | result == items.stream().mapToInt(item -> item.getTotalDiskUsage()).sum()
      */
-    @Model
-    private int getSumOfDiskUsages() {
-        int sum = 0;
+    @Override
+    public int getTotalDiskUsage() {
+        return items.stream().mapToInt(Item::getTotalDiskUsage).sum();
+        /*int sum = 0;
         for (Item item : items) {
             sum += item.getTotalDiskUsage();
         }
-        return sum;
+        return sum;*/
     }
 
 

@@ -92,6 +92,7 @@ __
     + void setWritable()
     + boolean isWritable()
     + void deleteRecursive()
+    # void deleteItem(Item item)
 ..Checkers..
     + {static} boolean isValidItem(Item item)
     + boolean hasProperItems()

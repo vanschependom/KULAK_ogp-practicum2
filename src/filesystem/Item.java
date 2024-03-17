@@ -43,6 +43,8 @@ public abstract class Item {
      * @effect  The parent directory is set to the given parent directory.
      *          If the given directory is not valid, an exception is thrown.
      *          | setParentDirectory(dir)
+     * @effect  The item is added to the list of items of the given directory
+     *          | dir.addItem(this)
      * @post    The new creation time of this item is initialized to some time during
      *          constructor execution.
      *          | (new.getCreationTime().getTime() >= System.currentTimeMillis()) &&
@@ -57,6 +59,7 @@ public abstract class Item {
     public Item(String name, Directory dir) throws IllegalParentDirectoryException {
         setName(name);
         setParentDirectory(dir);
+        dir.addItem(this);
     }
 
 
@@ -68,14 +71,21 @@ public abstract class Item {
     /**
      * A variable to check whether the item is deleted or not.
      */
-    protected boolean isDeleted;
+    protected boolean isDeleted = false;
 
     /**
-     * A method for deleting this item.
-     * TODO
+     * A method for terminating an item
+     *
+     * @effect  The parent directory of the item is set to null
+     *          | setParentDirectory(null)
+     * @effect  The item is deleted out of the parent directory
+     *          | getParentDirectory().deleteItem(this)
+     *
      */
     public void delete(){
+        this.getParentDirectory().deleteItem(this);
         setParentDirectory(null);
+        this.isDeleted = true;
     }
 
     /**
