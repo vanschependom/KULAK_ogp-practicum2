@@ -52,25 +52,44 @@ public class File extends Item {
      *          | (new.getCreationTime().getTime() <= (new System).currentTimeMillis())
      * @post    The new file has no time of last modification.
      *          | new.getModificationTime() == null
-     * @throws  [exception]
+     * @throws  IllegalParentDirectoryException
      *          The provided parent directory is not a valid parent directory.
      *          | ! canHaveAsParentDirectory(dir)
-     * @throws  [exception]
+     * @throws  IllegalArgumentException
      *          The provided file type is not a valid type.
      *          | ! isValidFileType()
-     * TODO develop exceptions and change signature
      */
-    public File(Directory dir, String name, int size, boolean writable, FileType type) throws Exception {
-        super(name, dir); // This can throw an exception! Todo: add to signature and specification
+    public File(Directory dir, String name, int size, boolean writable, FileType type) throws IllegalParentDirectoryException, IllegalArgumentException {
+        super(name, dir); // This throws IllegalParentDirectoryException
         if (!isValidFileType(type)) {
-            // TODO throw exception
+            throw new IllegalArgumentException("This is not a valid file type.");
         }
         fileType = type;
         setWritable(writable);
         setDiskUsage(size);
     }
 
-    // todo less extended constructors die de meest geextende constructor aanroepen
+    /**
+     *
+     * @param   dir
+     *          The parent directory of the new file.
+     * @param   name
+     *          The name of the new file.
+     * @param   type
+     *          The type of the new file.
+     * @effect  This new file is initialized with the given parent directory, the given name,
+     *          a zero size, true writablity and a given file type.
+     *          | this(dir, name, 0, true, type)
+     * @throws  IllegalParentDirectoryException
+     *          The provided parent directory is not a valid parent directory.
+     *          | ! canHaveAsParentDirectory(dir)
+     * @throws  IllegalArgumentException
+     *          The provided file type is not a valid type.
+     *          | !isValidFIleType()
+     */
+    public File(Directory dir, String name, FileType type) throws IllegalParentDirectoryException, IllegalArgumentException {
+        this(dir, name, 0, true, type);
+    }
 
     /**********************************************************
      * Destructors

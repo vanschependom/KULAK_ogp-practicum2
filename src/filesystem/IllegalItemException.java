@@ -28,7 +28,7 @@ public class IllegalItemException extends RuntimeException {
      *          The item for this new illegal item exception.
      * @post    The item of this new illegal item exception is equal to the item given.
      *          | new.getItem() = item
-     * @effect  This new illegal amount exception is further
+     * @effect  This new illegal item exception is further
      *          initialized as a new runtime exception involving no
      *          diagnostic message and no cause.
      *          | super()

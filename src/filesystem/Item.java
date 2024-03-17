@@ -48,11 +48,12 @@ public abstract class Item {
      *          | (new.getCreationTime().getTime() <= (new System).currentTimeMillis())
      * @post    The new item has no time of last modification.
      *          | new.getModificationTime() == null
-     *
-     * TODO: exception voor illegal directory
+     * @throws  IllegalParentDirectoryException
+     *          The provided parent directory is not a valid parent directory.
+     *          | ! canHaveAsParentDirectory(dir)
      */
     @Raw
-    public Item(String name, Directory dir) {
+    public Item(String name, Directory dir) throws IllegalParentDirectoryException {
         setName(name);
         setParentDirectory(dir);
     }
@@ -331,15 +332,19 @@ public abstract class Item {
      * Set the parent directory of this item to the given directory <dir>.
      * @param   dir
      *          The directory we want the parent directory to be set to.
-     * @post    TODO
+     * @post    If the given directory is valid as parent directory then the new parent
+     *          directory is set to dir.
+     *          | if canHaveAsParentDirectory(dir)
+     *          |   parentDirectory = dir
+     * @throws  IllegalParentDirectoryException
+     *          The provided parent directory is not a valid parent directory
+     *          | !canHaveAsParentDirectory
      * @note    This is package private because children need to access it.
-     *
-     * TODO: throws [exception] en de condities voor die exception uitwerken
      */
     @Model
     void setParentDirectory(Directory dir) {
         if ( !canHaveAsParentDirectory(dir) ) {
-            // throw exception
+            throw new IllegalParentDirectoryException(dir);
         } else {
             parentDirectory = dir;
         }
