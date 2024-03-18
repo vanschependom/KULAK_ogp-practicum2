@@ -208,13 +208,15 @@ public class Directory extends Item {
     /**
      * A variable referencing the items within this directory.
      */
-    private ArrayList<Item> items;
+    private ArrayList<Item> items = new ArrayList<>();
 
     /**
      * A method for adding an item to a directory
      *
      * @effect  The modification time is set to the current time
      *          | setModificationTime()
+     * @effect  The parent directory of the item is set to this directory
+     *          | item.setParentDirectory(this)
      * @post    The item is added to the directory
      *          | new.getNbItems() == getNbItems() + 1
      * @post    The item is at the correct index so that the directory
@@ -235,6 +237,7 @@ public class Directory extends Item {
         if (!isAddableItem(item)) {
             throw new IllegalItemException(item);
         }
+        item.setParentDirectory(this);
         int index = getIndexForItem(item);
         insertItemAtIndex(index, item);
         setModificationTime();
@@ -244,18 +247,18 @@ public class Directory extends Item {
     /**
      * A method for checking the index of a certain item
      *
-     * @return  The index of this item based on the lexigraphical order within the directory.
+     * @return  The index of this item based on the lexicographical order within the directory.
      *          | (items.getItemAt(result-1).getName().compareTo(item.getName()) < 0)
      *          |   && (items.getItemAt(result+1).getName().compareTo(item.getName()) > 0)
      * @throws  IllegalArgumentException
-     *          The item is not in the directory
-     *          | ! hasAsItem(item)
+     *          The item is already in the directory
+     *          | hasAsItem(item)
      */
     private int getIndexForItem(Item item) {
-        if (!hasAsItem(item)) {
-            throw new IllegalArgumentException("Item is not in directory.");
+        if (hasAsItem(item)) {
+            throw new IllegalArgumentException("Item is already in directory.");
         }
-        // get the index based on the lexigraphical order
+        // get the index based on the lexicographical order
         int index = 0;
         for (Item otherItem : items) {
             if (otherItem.getName().compareTo(item.getName()) < 0) {
@@ -428,6 +431,7 @@ public class Directory extends Item {
         if (!isValidName(name)) {
             throw new IllegalArgumentException("Name is not valid.");
         }
+        if (getNbOfItems() == 0) return false;
         for (Item item : items) {
             if (item.getName().equals(name)) {
                 return true;

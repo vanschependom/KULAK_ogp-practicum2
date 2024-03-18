@@ -32,7 +32,7 @@ public abstract class Item {
 
     /**
      * Initialize a new item with given name and parentDirectory.
-     *
+     *TODO het bidirectionele aspect nog
      * @param   name
      *          The name of the new item.
      * @param   dir
@@ -50,13 +50,14 @@ public abstract class Item {
      * @post    The new item has no time of last modification.
      *          | new.getModificationTime() == null
      * @throws  IllegalParentDirectoryException
-     *          The provided parent directory is not a valid parent directory.
-     *          | ! canHaveAsParentDirectory(dir)
+     *          The provided parent directory is not a valid parent directory or is null.
+     *          | (! canHaveAsParentDirectory(dir)) || (dir == null)
      */
     @Raw
     public Item(String name, Directory dir) throws IllegalParentDirectoryException {
         setName(name);
-        setParentDirectory(dir);
+        if (dir == null && !(this instanceof Directory)) throw new IllegalParentDirectoryException(dir);
+        if (dir != null) dir.addItem(this);
     }
 
 
