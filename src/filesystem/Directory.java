@@ -1,7 +1,6 @@
 package filesystem;
 
 import be.kuleuven.cs.som.annotate.*;
-
 import java.util.ArrayList;
 
 /**
@@ -221,7 +220,7 @@ public class Directory extends Item {
      *          | new.getNbItems() == getNbItems() + 1
      * @post    The item is at the correct index so that the directory
      *          is ordered.
-     *          | new.hasProperItems()
+     *          | new.hasProperItems() && new.isOrdered()
      * @throws  NotWritableException
      *          The directory is not writable.
      *          | ! isWritable()
@@ -255,6 +254,7 @@ public class Directory extends Item {
      *          | hasAsItem(item)
      */
     private int getIndexForItem(Item item) {
+        // TODO: opnieuw, is dit nodig? we checken vaak alles twee keer...
         if (hasAsItem(item)) {
             throw new IllegalArgumentException("Item is already in directory.");
         }
@@ -288,7 +288,8 @@ public class Directory extends Item {
      *          | ! canHaveAsIndex(index)
      */
     private void insertItemAtIndex(int index, Item item) throws NotWritableException, IllegalItemException, IndexOutOfBoundsException {
-        if(!isWritable()) {
+        // TODO kijk na of dit wel effectief nodig is, want we checken alles al in addItem:
+        /*if(!isWritable()) {
             throw new NotWritableException(this);
         }
         if(!isAddableItem(item)) {
@@ -296,7 +297,7 @@ public class Directory extends Item {
         }
         if(!canHaveAsIndex(index)) {
             throw new IndexOutOfBoundsException();
-        }
+        }*/
         items.add(index, item);
     }
 
@@ -364,6 +365,7 @@ public class Directory extends Item {
     /**
      * A method for checking if an index is a valid index for
      * accessing an item in items.
+     *
      * @param   index
      *          The index to check.
      * @return  True if the index is a positive integer (including zero)
@@ -462,7 +464,14 @@ public class Directory extends Item {
      *
      * @param   item
      *          The item to check
-     * @return  TODO
+     * @return  True if and only if the item is not null, is not already in the directory,
+     *          has no directory as its parent directory, has a unique name within the directory,
+     *          and can have this directory as its parent directory.
+     *          | result == ( (item != null)
+     *          |   && ! hasAsItem(item)
+     *          |   && item.getParentDirectory() == null
+     *          |   && ! containsDiskItemWithNameCaseSensitive(item.getName())
+     *          |   && item.canHaveAsParentDirectory(this) )
      */
     public boolean isAddableItem(Item item) {
         return (item != null)

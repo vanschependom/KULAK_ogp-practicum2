@@ -32,7 +32,7 @@ public abstract class Item {
 
     /**
      * Initialize a new item with given name and parentDirectory.
-     *TODO het bidirectionele aspect nog
+     * TODO het bidirectionele aspect nog
      * @param   name
      *          The name of the new item.
      * @param   dir
