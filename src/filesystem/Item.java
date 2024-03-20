@@ -476,4 +476,18 @@ public abstract class Item {
         setParentDirectory(null);
     }
 
+    /**
+     * A recursive method to find the root directory in which the item is located.
+     *
+     * @return  The root directory of the item
+     *          | TODO
+     */
+    public Directory getRoot() {
+        if (getParentDirectory() == null){
+            return (Directory) this;
+            // een item moet altijd in een map zitten dus hier is het veilig om casting te gebruiken
+        }
+        return getParentDirectory().getRoot();
+    }
+
 }
