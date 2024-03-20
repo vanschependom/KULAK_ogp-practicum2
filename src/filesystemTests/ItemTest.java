@@ -13,23 +13,25 @@ import org.junit.jupiter.api.*;
  */
 public class ItemTest {
 
-    Directory rootDir, subDir, subsubDir;
+    Directory rootDir, subDir, subSubDir;
     File file1, main;
     Link link;
+
+
 
     @BeforeEach
     public void setUpFixture(){
         rootDir = new Directory("rootDir");
         subDir = new Directory(rootDir,"subDir");
-        subsubDir = new Directory(subDir,"subsubDir");
-        file1 = new File(subsubDir, "file1", FileType.PDF);
+        subSubDir = new Directory(subDir,"subSubDir");
+        file1 = new File(subSubDir, "file1", FileType.PDF);
         main = new File(subDir, "main", FileType.JAVA);
         link = new Link("link_to_main", rootDir, main);
     }
 
     @Test
     public void absolutePathTest1(){
-        Assertions.assertEquals("/rootDir/subDir/subsubDir/file1.pdf", file1.getAbsolutePath());
+        Assertions.assertEquals("/rootDir/subDir/subSubDir/file1.pdf", file1.getAbsolutePath());
     }
 
     @Test
@@ -54,7 +56,7 @@ public class ItemTest {
 
     @Test
     public void absolutePathTest6(){
-        Assertions.assertEquals("/rootDir/subDir/subsubDir", subsubDir.getAbsolutePath());
+        Assertions.assertEquals("/rootDir/subDir/subSubDir", subSubDir.getAbsolutePath());
     }
 
 }

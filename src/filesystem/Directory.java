@@ -308,13 +308,13 @@ public class Directory extends Item {
      *          | result.getName().equals(name)
      * @throws  IllegalArgumentException
      *          The name is not valid.
-     *          | ! isValidName(name)
+     *          | ! super.isValidName(name)
      * @throws  IllegalArgumentException
      *          There is no item with the given name in the directory.
      *          | ! containsDiskItemWithNameCaseSensitive(name)
      */
     public Item getItem(String name) throws IllegalArgumentException {
-        if (!isValidName(name)) throw new IllegalArgumentException("Name is not valid.");
+        if (super.isValidName(name)) throw new IllegalArgumentException("Name is not valid.");
         if (!containsDiskItemWithNameCaseSensitive(name)) {
             throw new IllegalArgumentException("No item with the given name in the directory.");
         }
@@ -403,10 +403,10 @@ public class Directory extends Item {
      *          |   item.getName().equalsIgnoreCase(name) )
      * @throws  IllegalArgumentException
      *          The name is not valid.
-     *          | ! isValidName(name)
+     *          | ! super.isValidName(name)
      */
     public Boolean containsDiskItemWithName(String name) throws IllegalArgumentException {
-        if (!isValidName(name)) {
+        if (!super.isValidName(name)) {
             throw new IllegalArgumentException("Name is not valid.");
         }
         for (Item item : items) {
@@ -427,10 +427,10 @@ public class Directory extends Item {
      *          |   item.getName().equals(name) )
      * @throws  IllegalArgumentException
      *          The name is not valid.
-     *          | ! isValidName(name)
+     *          | ! super.isValidName(name)
      */
     public Boolean containsDiskItemWithNameCaseSensitive(String name) throws IllegalArgumentException {
-        if (!isValidName(name)) {
+        if (!super.isValidName(name)) {
             throw new IllegalArgumentException("Name is not valid.");
         }
         if (getNbOfItems() == 0) return false;

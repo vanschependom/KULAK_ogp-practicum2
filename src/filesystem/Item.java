@@ -56,7 +56,9 @@ public abstract class Item {
     @Raw
     public Item(String name, Directory dir) throws IllegalParentDirectoryException {
         setName(name);
-        if (dir == null && !(this instanceof Directory)) throw new IllegalParentDirectoryException(dir);
+        if(!canHaveAsParentDirectory(dir)){
+            throw new IllegalParentDirectoryException(dir);
+        };
         if (dir != null) dir.addItem(this);
     }
 
