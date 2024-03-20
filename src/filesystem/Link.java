@@ -49,17 +49,14 @@ public class Link extends Item {
      **********************************************************/
 
     /**
-     * Break the connection with the linked item.
-     * @post    The linked item is set to null
-     *          | getLinkedItem == null
+     * A destructor for this link.
      */
     @Override
-    public void delete(){
+    public void delete() {
         // TODO
-        // als linked item final is kunnen we het niet meer veranderen
-        // dus mss toch niet final maken
+        // ofwel niet overriden
+        // ofwel linkedItem naar null zetten
     }
-
 
 
     /**********************************************************
@@ -105,17 +102,6 @@ public class Link extends Item {
      */
     public boolean hasProperLinkedItem(){
         return isValidLinkedItem(getLinkedItem());
-    }
-
-    /**
-     * Changes the linked item to the new item.
-     * @param   item
-     *          The new linked item
-     * @note This is a help function for the terminator
-     */
-    @Raw
-    private void changeLinkTo(Item item){
-        // this.linkedItem = item;
     }
 
 

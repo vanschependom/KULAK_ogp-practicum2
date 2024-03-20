@@ -452,7 +452,9 @@ public class Directory extends Item {
     /**
      * A method for checking if an item is valid in a directory
      *
-     * @return  TODO
+     * @return  False if item is null.
+     *          False if item is its own parent directory
+     *          | result == (item != null) && item.getParentDirectory() == this
      */
     public boolean canHaveAsItem(Item item) {
         return (item != null)
@@ -619,7 +621,9 @@ public class Directory extends Item {
     /**
      * A method for calculating the som of all disk usages of the items in this directory.
      * @return  The sum of all disk usages of the items in this directory.
-     *          | TODO
+     *          | for item in items
+     *          |   result += item.getTotalDiskUsage()
+     *          |
      */
     @Model
     private int getSumOfDiskUsages() {
