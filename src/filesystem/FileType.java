@@ -10,19 +10,16 @@ package filesystem;
  */
 public enum FileType {
 
-    TEXT, PDF, JAVA;
+    TEXT("txt"), PDF("pdf"), JAVA("java");
+
+    private String extension = null;
+
+    private FileType(String extension) {
+        this.extension = extension;
+    }
 
     public String getExtension() {
-        switch (this) {
-            case TEXT:
-                return "txt";
-            case PDF:
-                return "pdf";
-            case JAVA:
-                return "java";
-            default:
-                return "";
-        }
+        return extension;
     }
 
 }
