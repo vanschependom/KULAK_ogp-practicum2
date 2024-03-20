@@ -510,7 +510,8 @@ public abstract class Item {
      *         | TODO betere formele specificatie, kweenie of dit goed is
      */
     public String getAbsolutePath() {
-        String path = ".";
+
+        String path = "";
         return getAbsolutePathRecursive(getParentDirectory(), path);
     }
 
@@ -519,7 +520,7 @@ public abstract class Item {
      *
      * @note Dit is public anders was het mij niet gelukt om de recursie op te roepen.
      */
-    public String getAbsolutePathRecursive(Directory parent, String currentPath) {
+    String getAbsolutePathRecursive(Directory parent, String currentPath) {
         String newPath = "/" + getName();
         if (parent == null) {
             return newPath + currentPath;

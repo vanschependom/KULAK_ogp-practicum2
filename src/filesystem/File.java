@@ -332,4 +332,23 @@ public class File extends Item {
             && (super.hasProperParentDirectory());
     }
 
+    /**********************************************************
+     * hierarchy - defensive programming
+     **********************************************************/
+
+    /**
+     * A recursive method to return a string with the complete path to the item.
+     *
+     * @return A string with the complete path to the item, starting with a slash
+     *         followed by the root directory, then a slash with the next directory, ...
+     *         and ending with a slash, the name of the item and a dot.
+     *         | result == /getRoot()/.../getParentDirectory()/getName().
+     *         | TODO betere formele specificatie, kweenie of dit goed is
+     */
+    @Override
+    public String getAbsolutePath() {
+        String path = "." + getFileType().getExtension();
+        return getAbsolutePathRecursive(getParentDirectory(), path);
+    }
+
 }

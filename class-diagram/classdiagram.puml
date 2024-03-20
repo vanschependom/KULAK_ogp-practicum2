@@ -62,6 +62,7 @@ __
     + boolean isDeletable()
     + void delete() (destructor)
     + int getTotalDiskUsage()
+    + String getAbsolutePath()
 }
 
 enum Filetype {

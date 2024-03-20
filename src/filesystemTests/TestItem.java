@@ -1,5 +1,9 @@
-package filesystem;
+package filesystemTests;
 
+import filesystem.Directory;
+import filesystem.File;
+import filesystem.FileType;
+import filesystem.Link;
 import org.junit.jupiter.api.*;
 
 /**
@@ -32,32 +36,32 @@ public class TestItem {
      */
     @Test
     public void absolutePathTest1(){
-        Assertions.assertEquals("/rootDir/subDir/subsubDir/file1.", file1.getAbsolutePath());
+        Assertions.assertEquals("/rootDir/subDir/subsubDir/file1.pdf", file1.getAbsolutePath());
     }
 
     @Test
     public void absolutePathTest2(){
-        Assertions.assertEquals("/rootDir/subDir/main.", main.getAbsolutePath());
+        Assertions.assertEquals("/rootDir/subDir/main.java", main.getAbsolutePath());
     }
 
     @Test
     public void absolutePathTest3(){
-        Assertions.assertEquals("/rootDir/link_to_main.", link.getAbsolutePath());
+        Assertions.assertEquals("/rootDir/link_to_main", link.getAbsolutePath());
     }
 
     @Test
     public void absolutePathTest4(){
-        Assertions.assertEquals("/rootDir.", rootDir.getAbsolutePath());
+        Assertions.assertEquals("/rootDir", rootDir.getAbsolutePath());
     }
 
     @Test
     public void absolutePathTest5(){
-        Assertions.assertEquals("/rootDir/subDir.", subDir.getAbsolutePath());
+        Assertions.assertEquals("/rootDir/subDir", subDir.getAbsolutePath());
     }
 
     @Test
     public void absolutePathTest6(){
-        Assertions.assertEquals("/rootDir/subDir/subsubDir.", subsubDir.getAbsolutePath());
+        Assertions.assertEquals("/rootDir/subDir/subsubDir", subsubDir.getAbsolutePath());
     }
 
 }
