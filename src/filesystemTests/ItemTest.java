@@ -1,20 +1,17 @@
 package filesystemTests;
 
-import filesystem.Directory;
-import filesystem.File;
-import filesystem.FileType;
-import filesystem.Link;
+import filesystem.*;
 import org.junit.jupiter.api.*;
 
 /**
  * A JUnit 5 test class for testing the public methods of the Item Class.
  *
- * @author Flor Demeulemeester
- * @author Arne Claerhout
- * @author Vincent Van Schependom
+ * @author  Flor Demeulemeester
+ * @author  Arne Claerhout
+ * @author  Vincent Van Schependom
  * @version 1.0
  */
-public class TestItem {
+public class ItemTest {
 
     Directory rootDir, subDir, subsubDir;
     File file1, main;
@@ -30,10 +27,6 @@ public class TestItem {
         link = new Link("link_to_main", rootDir, main);
     }
 
-    /**
-     * Ik heb gewoon wat tests gemaakt om er zeker van te zijn dat getAbsolutePath() werkt.
-     * Voorlopig staat de filetype niet in de naam van een file dus doe ik dat ook niet in de tests.
-     */
     @Test
     public void absolutePathTest1(){
         Assertions.assertEquals("/rootDir/subDir/subsubDir/file1.pdf", file1.getAbsolutePath());
