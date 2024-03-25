@@ -70,7 +70,7 @@ public class DirectoryTest {
         assertEquals("subDir", subDir.getName());
         assertEquals(rootDir, subDir.getRoot());
         assertTrue(subDir.isWritable());
-        assertEquals(2, subDir.getNbOfItems());
+        assertEquals(1, subDir.getNbOfItems());
         Date timeNow = new Date();
         assertTrue(timeBeforeCreation.before(subDir.getCreationTime()));
         assertTrue(subDir.getCreationTime().before(timeNow));
@@ -120,7 +120,8 @@ public class DirectoryTest {
         Date timeNow = new Date();
         assertTrue(timeBeforeCreation.before(rootDir.getCreationTime()));
         assertTrue(rootDir.getCreationTime().before(timeNow));
-        assertNull(rootDir.getModificationTime());
+        // Not null because of subDir
+        assertNotNull(rootDir.getModificationTime());
     }
 
     @Test
@@ -165,10 +166,17 @@ public class DirectoryTest {
     }
 
     @Test
-    public void testDirectoryRecursivelyDelete_IllegalCase() {
-        Directory dir = new Directory(dirNameAndWriteable, "dir4", true);
+    public void testDirectoryRecursivelyDelete_IllegalCase1() {
         assertThrows(NotWritableException.class, () -> {
             dirNameAndWriteable.deleteRecursive();
+        });
+    }
+
+    @Test
+    public void testDirectoryRecursivelyDelete_IllegalCase2() {
+        Directory dir = new Directory(rootDir, "directory", false);
+        assertThrows(NotWritableException.class, () -> {
+            rootDir.deleteRecursive();
         });
     }
 

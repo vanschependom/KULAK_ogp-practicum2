@@ -84,7 +84,6 @@ public class Directory extends Item {
     @Raw
     public Directory(String name, boolean writable) {
         this(null, name, writable);
-        this.makeRoot();
     }
 
     /**
@@ -168,9 +167,9 @@ public class Directory extends Item {
      *          | TODO
      */
     public boolean isRecursivelyDeletable() {
+        if (!isWritable()) return false;
         for (Item item : items) {
-            if ((item instanceof Directory && !((Directory) item).isRecursivelyDeletable()) ||
-                    (item instanceof File && !((File) item).isWritable())) return false;
+            if (item instanceof Directory && !((Directory) item).isRecursivelyDeletable()) return false;
         }
         return true;
     }
@@ -228,7 +227,7 @@ public class Directory extends Item {
      *          The item is not a valid item to be added this directory.
      *          | ! isAddableItem(item)
      */
-    public void addItem(Item item) throws
+    protected void addItem(Item item) throws
             NullPointerException, NotWritableException, IllegalItemException, IllegalArgumentException {
         if (!isWritable()) {
             throw new NotWritableException(this);
@@ -314,7 +313,7 @@ public class Directory extends Item {
      *          | ! containsDiskItemWithNameCaseSensitive(name)
      */
     public Item getItem(String name) throws IllegalArgumentException {
-        if (super.isValidName(name)) throw new IllegalArgumentException("Name is not valid.");
+        if (!super.isValidName(name)) throw new IllegalArgumentException("Name is not valid.");
         if (!containsDiskItemWithNameCaseSensitive(name)) {
             throw new IllegalArgumentException("No item with the given name in the directory.");
         }
@@ -394,6 +393,7 @@ public class Directory extends Item {
     }
 
     /**
+     * //TODO is deze methode wel nodig aangezien we deze nergens gebruiken?
      * A method for checking if a directory contains a given item with a name,
      * regardless of the case of the letters.
      *
