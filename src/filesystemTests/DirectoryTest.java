@@ -20,6 +20,7 @@ public class DirectoryTest {
 
     @BeforeEach
     public void setUpFixture(){
+        sleep();
         rootDir = new Directory("rootDir");
         subDir = new Directory(rootDir,"subDir");
         timeDuringCreation = new Date();
@@ -27,7 +28,7 @@ public class DirectoryTest {
         file1 = new File(subsubDir, "file1", FileType.PDF);
         dirFull = new Directory(rootDir, "dir", true);
         dirNameAndWriteable = new Directory("dir", false);
-        link = new Link("link", subDir, file1);
+        //link = new Link("link", subDir, file1);
     }
 
     @Test
@@ -90,6 +91,7 @@ public class DirectoryTest {
 
     @Test
     public void testDirectoryStringBooleanType_LegalCase() {
+        sleep();
         assertEquals("dir", dirNameAndWriteable.getName());
         assertTrue(dirNameAndWriteable.isRoot());
         assertFalse(dirNameAndWriteable.isWritable());
@@ -109,6 +111,7 @@ public class DirectoryTest {
 
     @Test
     public void testDirectoryStringType_LegalCase() {
+        sleep();
         assertEquals("rootDir", rootDir.getName());
         assertTrue(rootDir.isRoot());
         assertTrue(rootDir.isWritable());
@@ -146,6 +149,9 @@ public class DirectoryTest {
     @Test
     public void testDirectoryRecursivelyDelete_LegalCase() {
         rootDir.deleteRecursive();
+        assertEquals(0, rootDir.getNbOfItems());
+        assertEquals(0, subDir.getNbOfItems());
+        assertEquals(0, subsubDir.getNbOfItems());
         assertNull(subDir.getParentDirectory());
         assertNull(subsubDir.getParentDirectory());
         assertNull(file1.getParentDirectory());
@@ -157,6 +163,96 @@ public class DirectoryTest {
         assertEquals(0, subDir.getNbOfItems());
         assertEquals(0, subsubDir.getNbOfItems());
     }
+
+    @Test
+    public void testDirectoryRecursivelyDelete_IllegalCase() {
+        Directory dir = new Directory(dirNameAndWriteable, "dir4", true);
+        assertThrows(NotWritableException.class, () -> {
+            dirNameAndWriteable.deleteRecursive();
+        });
+    }
+
+    @Test
+    public void testDirectoryGetItem_LegalCase() {
+        assertEquals(file1, subsubDir.getItem("file1"));
+    }
+
+    @Test
+    public void testDirectoryGetItem_IllegalCaseNameNotInDir() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            subsubDir.getItem("file2");
+        });
+    }
+
+    @Test
+    public void testDirectoryGetItem_IllegalCaseNameNotValid() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            subsubDir.getItem("file2 #p>");
+        });
+    }
+
+    @Test
+    public void testDirectoryGetItemAt_LegalCase() {
+        File file = new File(subsubDir, "hello", FileType.JAVA);
+        assertEquals(file,subsubDir.getItemAt(1));
+    }
+
+    @Test
+    public void testDirectoryGetItemAt_IllegalCase() {
+        File file = new File(subsubDir, "hello", FileType.JAVA);
+        assertThrows(IndexOutOfBoundsException.class, () -> {
+            subsubDir.getItemAt(6);
+        });
+    }
+
+    @Test
+    public void testDirectoryGetIndexOf_LegalCase() {
+        File file = new File(subsubDir, "hello", FileType.JAVA);
+        assertEquals(1,subsubDir.getIndexOf(file));
+    }
+
+    @Test
+    public void testDirectoryGetIndexOf_IllegalCaseItemIsNull() {
+        assertThrows(NullPointerException.class, () -> {
+            subsubDir.getIndexOf(null);
+        });
+    }
+
+    @Test
+    public void testDirectoryGetIndexOf_IllegalCaseItemNotInDirectory() {
+        File file = new File(rootDir, "file1", FileType.PDF);
+        assertThrows(IllegalArgumentException.class, () -> {
+            subsubDir.getIndexOf(file);
+        });
+    }
+
+    @Test
+    public void testDirectoryCanHaveAsIndex() {
+        File file = new File(rootDir, "file1", FileType.PDF);
+        File file2 = new File(rootDir, "file2", FileType.PDF);
+        assertTrue(rootDir.canHaveAsIndex(1));
+        assertFalse(rootDir.canHaveAsIndex(-1));
+        assertFalse(rootDir.canHaveAsIndex(6));
+    }
+
+    @Test
+    public void testDirectoryHasAsItem_LegalCases() {
+        File file = new File(rootDir, "file1", FileType.PDF);
+        File file2 = new File(rootDir, "file2", FileType.PDF);
+        assertTrue(rootDir.hasAsItem(file));
+        assertTrue(rootDir.hasAsItem(subDir));
+        assertTrue(rootDir.hasAsItem(file2));
+        assertFalse(rootDir.hasAsItem(file1));
+        assertFalse(rootDir.hasAsItem(subsubDir));
+    }
+
+    @Test
+    public void testDirectoryHasAsItem_IllegalCase() {
+        assertThrows(NullPointerException.class, () -> {
+            rootDir.hasAsItem(null);
+        });
+    }
+
 
     private void sleep() {
         try {
