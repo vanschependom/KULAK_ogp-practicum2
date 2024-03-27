@@ -153,7 +153,7 @@ public class Directory extends Item {
      */
     public void deleteRecursive() throws NotWritableException {
         if (!isRecursivelyDeletable()) throw new NotWritableException(this);
-        for (int i = 0; i < getNbOfItems(); i++) {
+        while (0 < getNbOfItems()) {
             Item item = getItemAt(0);
             if (item instanceof Directory) {
                 ((Directory) item).deleteRecursive();

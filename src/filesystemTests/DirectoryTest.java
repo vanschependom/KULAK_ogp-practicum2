@@ -22,8 +22,7 @@ public class DirectoryTest {
     public void setUpFixture(){
         sleep();
         rootDir = new Directory("rootDir");
-        subDir = new Directory(
-                rootDir,"subDir");
+        subDir = new Directory(rootDir,"subDir");
         timeDuringCreation = new Date();
         subsubDir = new Directory(subDir,"subsubDir");
         file1 = new File(subsubDir, "file1", FileType.PDF);
@@ -148,17 +147,53 @@ public class DirectoryTest {
     }
 
     @Test
-    public void testDirectoryRecursivelyDelete_LegalCase() {
-        subDir.deleteRecursive();
+    public void testDirectoryRecursivelyDelete_LegalCase1() {
+        // We will delete rootDir
+        // Everything has to be deleted
+        rootDir.deleteRecursive();
+        // All the directories must be empty
+        assertEquals(0, rootDir.getNbOfItems());
         assertEquals(0, subsubDir.getNbOfItems());
         assertEquals(0, subDir.getNbOfItems());
-        assertEquals(0, rootDir.getNbOfItems());
-        assertEquals(0, subDir.getNbOfItems());
+        // All the parent directories must be null
         assertNull(subDir.getParentDirectory());
         assertNull(subsubDir.getParentDirectory());
         assertNull(file1.getParentDirectory());
+        assertNull(dirFull.getParentDirectory());
+        // All items must be deleted
         assertTrue(rootDir.isDeleted());
         assertTrue(subDir.isDeleted());
+        assertTrue(subsubDir.isDeleted());
+        assertTrue(file1.isDeleted());
+        assertTrue(dirFull.isDeleted());
+    }
+
+    @Test
+    public void testDirectoryRecursivelyDelete_LegalCase2() {
+        // We will delete subdir
+        subDir.deleteRecursive();
+        assertEquals(0, subsubDir.getNbOfItems());
+        assertEquals(0, subDir.getNbOfItems());
+        // There still is one item in rootDir (see SetUpFixture)
+        assertEquals(1, rootDir.getNbOfItems());
+        assertNull(subDir.getParentDirectory());
+        assertNull(subsubDir.getParentDirectory());
+        assertNull(file1.getParentDirectory());
+        assertTrue(subDir.isDeleted());
+        assertTrue(subsubDir.isDeleted());
+        assertTrue(file1.isDeleted());
+    }
+
+    @Test
+    public void testDirectoryRecursivelyDelete_LegalCase3() {
+        // We will delete subsubdir
+        subsubDir.deleteRecursive();
+        assertEquals(0, subsubDir.getNbOfItems());
+        assertEquals(0, subDir.getNbOfItems());
+        // There still items in rootDir (see SetUpFixture)
+        assertEquals(2, rootDir.getNbOfItems());
+        assertNull(subsubDir.getParentDirectory());
+        assertNull(file1.getParentDirectory());
         assertTrue(subsubDir.isDeleted());
         assertTrue(file1.isDeleted());
     }
@@ -268,10 +303,11 @@ public class DirectoryTest {
 
     @Test
     public void testDirectoryContainsDiskItemWithName() {
-        // test different ways to write subdir, and file1
+        // test different ways to write subdir
         assertTrue(rootDir.containsDiskItemWithName("subdir"));
         assertTrue(rootDir.containsDiskItemWithName("SubdIR"));
         assertTrue(rootDir.containsDiskItemWithName("subDir"));
+        // test different ways to write file
         assertTrue(subsubDir.containsDiskItemWithName("fILe1"));
         assertTrue(subsubDir.containsDiskItemWithName("file1"));
         assertFalse(subsubDir.containsDiskItemWithName("file2"));
@@ -280,13 +316,15 @@ public class DirectoryTest {
 
     @Test
     public void testDirectoryContainsDiskItemWithNameCaseSensitive() {
-        // test different ways to write subdir, and file1
-        assertFalse(rootDir.containsDiskItemWithName("subdir"));
-        assertFalse(rootDir.containsDiskItemWithName("SubdIR"));
-        assertTrue(rootDir.containsDiskItemWithName("subDir"));
-        assertFalse(subsubDir.containsDiskItemWithName("fILe1"));
-        assertTrue(subsubDir.containsDiskItemWithName("file1"));
+        // test different ways to write subdir
+        assertFalse(rootDir.containsDiskItemWithNameCaseSensitive("subdir"));
+        assertFalse(rootDir.containsDiskItemWithNameCaseSensitive("SubdIR"));
+        assertTrue(rootDir.containsDiskItemWithNameCaseSensitive("subDir"));
+        // test different ways to write file1
+        assertFalse(subsubDir.containsDiskItemWithNameCaseSensitive("fILe1"));
+        assertTrue(subsubDir.containsDiskItemWithNameCaseSensitive("file1"));
     }
+
 
 
     private void sleep() {
@@ -296,8 +334,5 @@ public class DirectoryTest {
             e.printStackTrace();
         }
     }
-
-
-
 
 }
