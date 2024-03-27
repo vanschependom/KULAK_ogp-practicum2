@@ -347,8 +347,9 @@ public class File extends Item {
      */
     @Override
     public String getAbsolutePath() {
-        String path = "." + getFileType().getExtension();
-        return getAbsolutePathRecursive(getParentDirectory(), path);
+//        String path = "." + getFileType().getExtension();
+//        return getAbsolutePathRecursive(getParentDirectory(), path);
+        return super.getAbsolutePathRecursive() + "." + getFileType().getExtension();
     }
 
 }

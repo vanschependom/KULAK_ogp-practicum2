@@ -140,7 +140,7 @@ public class Directory extends Item {
 
 
     /**
-     * A method for deleting a directory recursively
+     * A recursive method for deleting a directory recursively
      *
      * @post    The directory and its contents are deleted
      *          | for each item in items:
@@ -153,18 +153,22 @@ public class Directory extends Item {
      */
     public void deleteRecursive() throws NotWritableException {
         if (!isRecursivelyDeletable()) throw new NotWritableException(this);
-        for (Item item : items) {
-            if (item instanceof Directory) ((Directory) item).deleteRecursive();
+        for (int i = 0; i < getNbOfItems(); i++) {
+            Item item = getItemAt(0);
+            if (item instanceof Directory) {
+                ((Directory) item).deleteRecursive();
+            }
             else item.delete();
         }
         super.delete();
     }
 
     /**
-     * A method for checking if a directory is recursively deletable
+     * A recursive method for checking if a directory is recursively deletable
      *
      * @return  True if the directory is deletable
-     *          | TODO
+     *          | for each item in directory:
+     *          |   item.isWritable()
      */
     public boolean isRecursivelyDeletable() {
         if (!isWritable()) return false;
@@ -223,19 +227,12 @@ public class Directory extends Item {
      * @throws  NotWritableException
      *          The directory is not writable.
      *          | ! isWritable()
-     * @throws  IllegalItemException
-     *          The item is not a valid item to be added this directory.
-     *          | ! isAddableItem(item)
      */
     protected void addItem(Item item) throws
             NullPointerException, NotWritableException, IllegalItemException, IllegalArgumentException {
         if (!isWritable()) {
             throw new NotWritableException(this);
         }
-        if (!isAddableItem(item)) {
-            throw new IllegalItemException(item);
-        }
-        item.setParentDirectory(this);
         int index = getIndexForItem(item);
         insertItemAtIndex(index, item);
         setModificationTime();
@@ -279,24 +276,18 @@ public class Directory extends Item {
      * @throws  NotWritableException
      *          The directory is not writable
      *          | ! isWritable()
-     * @throws  IllegalItemException
-     *          The item is not a valid item to be added to this directory
-     *          | ! isAddableItem(item)
      * @throws  IndexOutOfBoundsException
      *          The index is not a valid index for this directory
      *          | ! canHaveAsIndex(index)
      */
-    private void insertItemAtIndex(int index, Item item) throws NotWritableException, IllegalItemException, IndexOutOfBoundsException {
+    private void insertItemAtIndex(int index, Item item) throws NotWritableException, IndexOutOfBoundsException {
         // TODO kijk na of dit wel effectief nodig is, want we checken alles al in addItem:
         /*if(!isWritable()) {
             throw new NotWritableException(this);
-        }
-        if(!isAddableItem(item)) {
-            throw new IllegalItemException(item);
-        }
+        }*/
         if(!canHaveAsIndex(index)) {
             throw new IndexOutOfBoundsException();
-        }*/
+        }
         items.add(index, item);
     }
 
@@ -373,7 +364,7 @@ public class Directory extends Item {
      *          |   && (index < getNbOfItems()) )
      */
     public boolean canHaveAsIndex(int index) {
-        return index >= 0 && index < getNbOfItems();
+        return index >= 0 && index <= getNbOfItems();
     }
 
     /**
@@ -393,7 +384,6 @@ public class Directory extends Item {
     }
 
     /**
-     * //TODO is deze methode wel nodig aangezien we deze nergens gebruiken?
      * A method for checking if a directory contains a given item with a name,
      * regardless of the case of the letters.
      *
@@ -459,28 +449,6 @@ public class Directory extends Item {
     public boolean canHaveAsItem(Item item) {
         return (item != null)
                 && item.getParentDirectory() == this;
-    }
-
-    /**
-     * A method for checking if a given item can be added as an item within this directory.
-     *
-     * @param   item
-     *          The item to check
-     * @return  True if and only if the item is not null, is not already in the directory,
-     *          has no directory as its parent directory, has a unique name within the directory,
-     *          and can have this directory as its parent directory.
-     *          | result == ( (item != null)
-     *          |   && ! hasAsItem(item)
-     *          |   && item.getParentDirectory() == null
-     *          |   && ! containsDiskItemWithNameCaseSensitive(item.getName())
-     *          |   && item.canHaveAsParentDirectory(this) )
-     */
-    public boolean isAddableItem(Item item) {
-        return (item != null)
-                && !hasAsItem(item)
-                && item.getParentDirectory() == null
-                && !containsDiskItemWithNameCaseSensitive(item.getName())
-                && item.canHaveAsParentDirectory(this);
     }
 
     /**

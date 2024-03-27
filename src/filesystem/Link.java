@@ -43,22 +43,6 @@ public class Link extends Item {
     }
 
 
-
-    /**********************************************************
-     * Destructors
-     **********************************************************/
-
-    /**
-     * A destructor for this link.
-     */
-    @Override
-    public void delete() {
-        // TODO
-        // ofwel niet overriden
-        // ofwel linkedItem naar null zetten
-    }
-
-
     /**********************************************************
      * linkedItem - defensive programming
      **********************************************************/
@@ -73,9 +57,13 @@ public class Link extends Item {
     /**
      * A method for getting the linked item of this link.
      */
-    @Basic @Immutable
+    @Basic
     public Item getLinkedItem() {
-        return linkedItem;
+        if (!isDeleted()){
+            return linkedItem;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -103,7 +91,6 @@ public class Link extends Item {
     public boolean hasProperLinkedItem(){
         return isValidLinkedItem(getLinkedItem());
     }
-
 
 
     /**********************************************************

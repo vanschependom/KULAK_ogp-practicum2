@@ -59,7 +59,10 @@ public abstract class Item {
         if(!canHaveAsParentDirectory(dir)){
             throw new IllegalParentDirectoryException(dir);
         };
-        if (dir != null) dir.addItem(this);
+        if (dir != null && isAddableToDirectory(dir)) {
+            setParentDirectory(dir);
+            dir.addItem(this);
+        }
     }
 
 
@@ -345,6 +348,22 @@ public abstract class Item {
     }
 
     /**
+     * A method for checking if this item is addable to a given directory.
+     *
+     * @return  True if the file is not already in the directory,
+     *          the dir doesn't already contain an item with this items name
+     *          and this item can have the given dir as its parent dir.
+     *          | result == ( !dir.hasAsItem(this)
+     *          |               && !dir.containsDiskItemWithNameCaseSensitive(getName())
+     *          |               && this.canHaveAsParentDirectory(dir) )
+     */
+    public boolean isAddableToDirectory(Directory dir) {
+        return !dir.hasAsItem(this)
+                && !dir.containsDiskItemWithNameCaseSensitive(getName())
+                && this.canHaveAsParentDirectory(dir);
+    }
+
+    /**
      * Check whether this item can have the given directory as its
      * parent directory.
      *
@@ -376,7 +395,9 @@ public abstract class Item {
      */
     @Model
     void setParentDirectory(Directory dir) {
-        if ( !canHaveAsParentDirectory(dir) ) {
+        if (isDeleted() && dir == null) {
+            parentDirectory = null;
+        } else if ( !canHaveAsParentDirectory(dir) ) {
             throw new IllegalParentDirectoryException(dir);
         } else {
             parentDirectory = dir;
@@ -470,64 +491,63 @@ public abstract class Item {
      *          The directory to move the item to.
      */
     public void move(Directory dir) throws IllegalParentDirectoryException {
-        if (!canHaveAsParentDirectory(dir) || !dir.isAddableItem(this)) {
+        if (!canHaveAsParentDirectory(dir) || !isAddableToDirectory(dir)) {
             throw new IllegalParentDirectoryException(dir);
         }
         getParentDirectory().removeAsItem(this);
         dir.addItem(this);
-        setParentDirectory(null);
+        setParentDirectory(dir);
     }
 
     /**
      * A recursive method to find the root directory in which the item is located.
      *
      * @return  The root directory of the item
-     *          | TODO
+     *          | if ( getParentDirectory() == null ) then
+     *          |   result == this
+     *          | else
+     *          |   result == getParentDirectory().getRoot()
      */
     public Directory getRoot() {
-        if (isRoot()) {
+        // if the parent directory is null, the item is definitely a directory
+        if ((getParentDirectory() == null)) {
             return (Directory) this;
-            // een item moet altijd in een map zitten dus hier is het veilig om casting te gebruiken
+        } else {
+            return getParentDirectory().getRoot();
         }
-        return getParentDirectory().getRoot();
     }
 
     /**
-     * A method to check if the current parent directory is a root.
-     *
-     * @return  True if the directory is a root otherwise false
-     *          | result == getParentDirectory() == null
-     */
-    public boolean isRoot() {
-        return getParentDirectory() == null;
-    }
-
-    /**
-     * A recursive method to return a string with the complete path to the item.
+     * A method to return a string with the complete path to the item.
      *
      * @return A string with the complete path to the item, starting with a slash
      *         followed by the root directory, then a slash with the next directory, ...
      *         and ending with a slash, the name of the item and a dot.
-     *         | result == /getRoot()/.../getParentDirectory()/getName().
-     *         | TODO betere formele specificatie, kweenie of dit goed is
+     *         | getAbsolutePathRecursive(getParentDirectory(), path)
      */
     public String getAbsolutePath() {
-
         String path = "";
-        return getAbsolutePathRecursive(getParentDirectory(), path);
+        return getAbsolutePathRecursive();
     }
 
     /**
-     * A help function for getAbsolutePath().
+     * A recursive help function for getAbsolutePath().
      *
-     * @note Dit is public anders was het mij niet gelukt om de recursie op te roepen.
+     * @return  A part of the absolute path.
      */
-    String getAbsolutePathRecursive(Directory parent, String currentPath) {
+    /*protected String getAbsolutePathRecursive(Directory parent, String currentPath) {
         String newPath = "/" + getName();
         if (parent == null) {
             return newPath + currentPath;
         }
         return parent.getAbsolutePathRecursive(parent.getParentDirectory(),newPath + currentPath);
+    }*/
+
+    protected String getAbsolutePathRecursive() {
+        if (getParentDirectory() == null) {
+            return getName();
+        }
+        return getParentDirectory().getAbsolutePathRecursive() + "/" + getName();
     }
 
 }
