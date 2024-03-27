@@ -85,6 +85,27 @@ public class File extends Item {
         this(dir, name, 0, true, type);
     }
 
+    /**********************************************************
+     * Destructors
+     **********************************************************/
+
+    /**
+     * A destructor for this directory.
+     *
+     * @effect  The destructor for the superclass Item is called.
+     *          | super.delete()
+     * @throws  NotWritableException
+     *          The directory is not writable.
+     *          | isWriteable() == false
+     */
+    @Override
+    public void delete() throws NotWritableException {
+        if (!isWritable()){
+            throw new NotWritableException(this);
+        }
+        super.delete();
+    }
+
 
     /**********************************************************
      * size - nominal programming

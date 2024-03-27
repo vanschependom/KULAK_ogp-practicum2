@@ -114,16 +114,22 @@ public class Directory extends Item {
      * @throws  DirectoryNotEmptyException
      *          The directory is not empty.
      *          | getNbOfItems() != 0
+     * @throws  NotWritableException
+     *          The directory is not writable
+     *          | isWriteable() == false
      */
     @Override
-    public void delete() throws DirectoryNotEmptyException {
+    public void delete() throws DirectoryNotEmptyException, NotWritableException {
+        if (!isWritable()){
+            throw new NotWritableException(this);
+        }
         if (getNbOfItems() != 0) {
             throw new DirectoryNotEmptyException(this);
         }
         super.delete();
     }
 
-        /* TODO staat in klassendiagram maar wordt nergens gebruikt, staat ook nog niet in Item als we het wel zouden implementeren
+    /* TODO staat in klassendiagram maar wordt nergens gebruikt, staat ook nog niet in Item als we het wel zouden implementeren
     /**
      * A method for checking if a directory is deletable.
      *
