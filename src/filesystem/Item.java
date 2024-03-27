@@ -521,28 +521,21 @@ public abstract class Item {
      * A method to return a string with the complete path to the item.
      *
      * @return A string with the complete path to the item, starting with a slash
-     *         followed by the root directory, then a slash with the next directory, ...
-     *         and ending with a slash, the name of the item and a dot.
-     *         | getAbsolutePathRecursive(getParentDirectory(), path)
+     *         followed by the root directory, then a slash with the next directory, ...,
+     *         and ending with a slash and the name of the item.
+     *         | result = "/" + getAbsolutePathRecursive()
      */
     public String getAbsolutePath() {
-        String path = "";
-        return getAbsolutePathRecursive();
+        return "/" + getAbsolutePathRecursive();
     }
 
     /**
      * A recursive help function for getAbsolutePath().
      *
      * @return  A part of the absolute path.
+     *          | if isRoot() then result == getName()
+     *          | else result == getParentDirectory().getAbsolutePathRecursive() + "/" + getName()
      */
-    /*protected String getAbsolutePathRecursive(Directory parent, String currentPath) {
-        String newPath = "/" + getName();
-        if (parent == null) {
-            return newPath + currentPath;
-        }
-        return parent.getAbsolutePathRecursive(parent.getParentDirectory(),newPath + currentPath);
-    }*/
-
     protected String getAbsolutePathRecursive() {
         if (getParentDirectory() == null) {
             return getName();
