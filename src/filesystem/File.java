@@ -35,28 +35,23 @@ public class File extends Item {
      *          The writability of the new file.
      * @param   type
      *          The type of the new file
-     * @effect  The name of the file is set to the given name.
-     * 			If the given name is not valid, a default name is set.
-     *          | setName(name)
      * @effect	The size is set to the given size (must be valid)
      * 			| setSize(size)
      * @effect	The writability is set to the given flag
      * 			| setWritable(writable)
-     * @effect  The parent directory is set to the given directory.
-     *          | setParentDirectory(dir)
+     * @effect  This file is further initialized as a new item with the given parent directory and name.
+     *          | super(name, dir)
      * @post    The new creation time of this file is initialized to some time during
      *          constructor execution.
      *          | (new.getCreationTime().getTime() >= System.currentTimeMillis()) &&
      *          | (new.getCreationTime().getTime() <= (new System).currentTimeMillis())
      * @post    The new file has no time of last modification.
      *          | new.getModificationTime() == null
-     * @throws  IllegalParentDirectoryException
-     *          The provided parent directory is not a valid parent directory.
-     *          | ! canHaveAsParentDirectory(dir)
      * @throws  IllegalArgumentException
      *          The provided file type is not a valid type.
      *          | ! isValidFileType()
      */
+    @Raw
     public File(Directory dir, String name, int size, boolean writable, FileType type) throws IllegalParentDirectoryException, IllegalArgumentException {
         super(name, dir); // This throws IllegalParentDirectoryException
         if (!isValidFileType(type)) {
@@ -78,12 +73,15 @@ public class File extends Item {
      * @param   type
      *          The type of the new file.
      * @effect  This new file is initialized with the given parent directory, the given name,
-     *          a size of 0 bytes, a writablity of true and the given file type.
+     *          a size of 0 bytes, a writability of true and the given file type.
      *          | this(dir, name, 0, true, type)
      */
+    @Raw
     public File(Directory dir, String name, FileType type) throws IllegalParentDirectoryException, IllegalArgumentException {
         this(dir, name, 0, true, type);
     }
+
+
 
     /**********************************************************
      * Destructors
@@ -165,6 +163,7 @@ public class File extends Item {
      *         exceed the maximum size.
      *         | result == ((size >= 0) && (size <= getMaximumSize()))
      */
+    @Raw
     public static boolean isValidSize(int size) {
         return ((size >= 0) && (size <= getMaximumSize()));
     }
@@ -287,9 +286,11 @@ public class File extends Item {
      * 			| result ==
      * 			|	(type != null)
      */
+    @Raw
     public static boolean isValidFileType(FileType type) {
         return (type != null);
     }
+
 
 
     /**********************************************************
@@ -314,43 +315,6 @@ public class File extends Item {
         } else {
             throw new NotWritableException(this);
         }
-    }
-
-
-
-    /**********************************************************
-     * parent directory - defensive programming
-     **********************************************************/
-
-    /**
-     * Check whether this file can have the given directory as its
-     * parent directory.
-     *
-     * @param   dir
-     *          The directory to check.
-     * @return  True if the given directory is effective and
-     *          if the directory can be the parent directory of an item.
-     *          | result == ( (dir != null)
-     *          |          && (super.canHaveAsParentDirectory(dir)) )
-     */
-    @Override
-    public boolean canHaveAsParentDirectory(Directory dir) {
-        return (dir != null) && (super.canHaveAsParentDirectory(dir));
-    }
-
-    /**
-     * A method for checking if this file has a proper parent directory.
-     *
-     * @return  True if and only if the parent directory is not null
-     *          and satisfies the hasProperParentDirectory() method
-     *          of the superclass.
-     *          | result == ( (getParentDirectory() != null)
-     *          |               && super.hasProperParentDirectory() )
-     */
-    @Override
-    public boolean hasProperParentDirectory() {
-        return (getParentDirectory() != null)
-            && (super.hasProperParentDirectory());
     }
 
     /**********************************************************

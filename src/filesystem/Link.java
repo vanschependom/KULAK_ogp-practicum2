@@ -30,8 +30,8 @@ public class Link extends Item {
      *          The item which the link is referring to.
      * @effect  A new item is initialized with the given name and directory.
      *          | super(name, dir)
-     * @effect  The linked item is set to the given item.
-     *          | setLinkedItem(linkedItem)
+     * @post    The linked item of this link is set to the given linked item.
+     *          | new.getLinkedItem() == linkedItem
      */
     @Raw
     public Link(String name, Directory dir, Item linkedItem) throws IllegalItemException {
@@ -80,6 +80,7 @@ public class Link extends Item {
      *          |   ( !(item instanceof Link)
      *          |       && (item != null) )
      */
+    @Raw
     public static boolean isValidLinkedItem(Item item) {
         return !(item instanceof Link)
                 && item != null;
@@ -88,44 +89,9 @@ public class Link extends Item {
     /**
      * Checks whether the link is linking to a legal item.
      */
+    @Raw
     public boolean hasProperLinkedItem(){
         return isValidLinkedItem(getLinkedItem());
-    }
-
-
-    /**********************************************************
-     * parent directory - defensive programming
-     **********************************************************/
-
-    /**
-     * Check whether this link can have the given directory as its
-     * parent directory.
-     *
-     * @param   dir
-     *          The directory to check.
-     * @return  True if the given directory is effective and
-     *          if the directory can be the parent directory of an item.
-     *          | result == ( (dir != null)
-     *          |          && (super.canHaveAsParentDirectory(dir)) )
-     */
-    @Override
-    public boolean canHaveAsParentDirectory(Directory dir) {
-        return (dir != null) && (super.canHaveAsParentDirectory(dir));
-    }
-
-    /**
-     * A method for checking if this link has a proper parent directory.
-     *
-     * @return  True if and only if the parent directory is not null
-     *          and satisfies the hasProperParentDirectory() method
-     *          of the superclass.
-     *          | result == ( (getParentDirectory() != null)
-     *          |               && super.hasProperParentDirectory() )
-     */
-    @Override
-    public boolean hasProperParentDirectory() {
-        return (getParentDirectory() != null)
-                && (super.hasProperParentDirectory());
     }
 
 }

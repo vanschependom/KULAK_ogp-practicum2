@@ -32,7 +32,6 @@ public abstract class Item {
 
     /**
      * Initialize a new item with given name and parentDirectory.
-     * TODO het bidirectionele aspect nog
      * @param   name
      *          The name of the new item.
      * @param   dir
@@ -40,29 +39,21 @@ public abstract class Item {
      * @effect  The name of the item is set to the given name.
      * 			If the given name is not valid, a default name is set.
      *          | setName(name)
-     * @effect  The parent directory is set to the given parent directory.
-     *          If the given directory is not valid, an exception is thrown.
-     *          | setParentDirectory(dir)
+     * @effect  The item is moved to the given directory.
+     *          | move(dir)
+     * @effect  The disk usage of the item is set to 0.
+     *          | setDiskUsage(0)
      * @post    The new creation time of this item is initialized to some time during
      *          constructor execution.
      *          | (new.getCreationTime().getTime() >= System.currentTimeMillis()) &&
      *          | (new.getCreationTime().getTime() <= (new System).currentTimeMillis())
      * @post    The new item has no time of last modification.
      *          | new.getModificationTime() == null
-     * @throws  IllegalParentDirectoryException
-     *          The provided parent directory is not a valid parent directory or is null.
-     *          | (! canHaveAsParentDirectory(dir)) || (dir == null)
      */
     @Raw
     public Item(String name, Directory dir) throws IllegalParentDirectoryException {
         setName(name);
-        if(!canHaveAsParentDirectory(dir)){
-            throw new IllegalParentDirectoryException(dir);
-        };
-        if (dir != null && isAddableToDirectory(dir)) {
-            setParentDirectory(dir);
-            dir.addItem(this);
-        }
+        move(dir);
     }
 
 
@@ -74,7 +65,7 @@ public abstract class Item {
     /**
      * A variable to check whether the item is deleted or not.
      */
-    protected boolean isDeleted;
+    protected boolean isDeleted = false;
 
     /**
      * A destructor for this item.
@@ -83,7 +74,7 @@ public abstract class Item {
      *          the parent directory is effective, this item is removed
      *          from that parent directory and the parent directory of this
      *          item is set to null.
-     *          | if getParentDirectory != null
+     *          | if (getParentDirectory() != null) then
      *          |   getParentDirectory().removeAsItem(this)
      *          |   && setParentDirectory(null)
      * @post    If this item is not yet deleted, isDeleted
@@ -142,6 +133,7 @@ public abstract class Item {
      * 			| result ==
      * 			|	(name != null) && name.matches("[a-zA-Z_0-9.-]+")
      */
+    @Raw
     public boolean isValidName(String name) {
         return (name != null && name.matches("[a-zA-Z_0-9.-]+"));
     }
@@ -174,7 +166,7 @@ public abstract class Item {
      * @return   A valid item name.
      *          | isValidName(result)
      */
-    @Model
+    @Model @Raw
     private static String getDefaultName() {
         return "new_item_" + Integer.toString(nameIndex++);
     }
@@ -289,11 +281,9 @@ public abstract class Item {
      *         |                    System.currentTimeMillis()) &&
      *         | (new.getModificationTime().getTime() <=
      *         |                    (new System).currentTimeMillis())
-     * @note    This method is package private, because its children need
-     *          to access it.
      */
     @Model
-    void setModificationTime() {
+    protected void setModificationTime() {
         modificationTime = new Date();
     }
 
@@ -353,12 +343,14 @@ public abstract class Item {
      * @return  True if the file is not already in the directory,
      *          the dir doesn't already contain an item with this items name
      *          and this item can have the given dir as its parent dir.
-     *          | result == ( !dir.hasAsItem(this)
+     *          | result == ( dir != null
+     *          |               && !dir.hasAsItem(this)
      *          |               && !dir.containsDiskItemWithNameCaseSensitive(getName())
      *          |               && this.canHaveAsParentDirectory(dir) )
      */
     public boolean isAddableToDirectory(Directory dir) {
-        return !dir.hasAsItem(this)
+        return dir != null
+                && !dir.hasAsItem(this)
                 && !dir.containsDiskItemWithNameCaseSensitive(getName())
                 && this.canHaveAsParentDirectory(dir);
     }
@@ -369,11 +361,13 @@ public abstract class Item {
      *
      * @param   dir
      *          The directory to check.
-     * @return  TODO
+     * @return  True if the directory is effective and the name of this item is not
+     *          already taken in the directory.
+     *          | result == (dir != null) && !dir.containsDiskItemWithNameCaseSensitive(getName())
      */
+    @Raw
     public boolean canHaveAsParentDirectory(Directory dir) {
-        // the name must not be taken
-        return !dir.containsDiskItemWithNameCaseSensitive(getName());
+        return dir != null && !dir.containsDiskItemWithNameCaseSensitive(getName());
 	}
 
     /**
@@ -388,10 +382,9 @@ public abstract class Item {
      * @throws  IllegalParentDirectoryException
      *          The provided parent directory is not a valid parent directory
      *          | ! canHaveAsParentDirectory(dir)
-     * @note    This is package private because children need to access it.
      */
     @Model
-    void setParentDirectory(Directory dir) {
+    protected void setParentDirectory(Directory dir) {
         if (isDeleted() && dir == null) {
             parentDirectory = null;
         } else if ( !canHaveAsParentDirectory(dir) ) {
@@ -408,7 +401,7 @@ public abstract class Item {
      * @return  True if and only if the parent directory is a legal parent directory.
      *          | result == canHaveAsParentDirectory(getParentDirectory())
      */
-    @Model
+    @Raw
     public boolean hasProperParentDirectory() {
         return canHaveAsParentDirectory(getParentDirectory());
     }
@@ -456,7 +449,7 @@ public abstract class Item {
      * @return  True if the given amount of bits is positive or equal to zero.
      *          | result == (amtOfBits >= 0)
      */
-    public boolean isValidDiskUsage(int amtOfBits) {
+    public static boolean isValidDiskUsage(int amtOfBits) {
         return (amtOfBits >= 0);
     }
 
@@ -470,9 +463,8 @@ public abstract class Item {
      * @post    The diskUsage of this item is set to the given amount of bits.
      *
      * @note    We implemented this nominally, so we expect a legal value.
-     * @note    This is package private, since children must be able to call this method.
      */
-    void setDiskUsage(int diskUsage) {
+    protected void setDiskUsage(int diskUsage) {
         this.diskUsage = diskUsage;
     }
 
@@ -486,12 +478,30 @@ public abstract class Item {
      *
      * @param   dir
      *          The directory to move the item to.
+     * @effect  If the given directory is a valid parent directory and
+     *          the current parent directory is effective, the item is removed
+     *          from the current parent directory.
+     *          | if (isAddableToDirectory(dir) && getParentDirectory() != null)
+     *          |   then getParentDirectory().removeAsItem(this)
+     * @effect  If the given directory is a valid parent directory, the item is added
+     *          to the given directory.
+     *          | if (isAddableToDirectory(dir))
+     *          |   then dir.addItem(this)
+     * @effect  If the given directory is a valid parent directory, the parent directory
+     *          of this item is set to the given directory.
+     *          | if (isAddableToDirectory(dir))
+     *          |   then setParentDirectory(dir)
+     * @throws  IllegalParentDirectoryException
+     *          The given directory is not a valid parent directory.
      */
+    @Raw
     public void move(Directory dir) throws IllegalParentDirectoryException {
-        if (!canHaveAsParentDirectory(dir) || !isAddableToDirectory(dir)) {
+        if (!isAddableToDirectory(dir)) {
             throw new IllegalParentDirectoryException(dir);
         }
-        getParentDirectory().removeAsItem(this);
+        if (getParentDirectory() != null) {
+            getParentDirectory().removeAsItem(this);
+        }
         dir.addItem(this);
         setParentDirectory(dir);
     }
@@ -520,7 +530,7 @@ public abstract class Item {
      * @return A string with the complete path to the item, starting with a slash
      *         followed by the root directory, then a slash with the next directory, ...,
      *         and ending with a slash and the name of the item.
-     *         | result = "/" + getAbsolutePathRecursive()
+     *         | result == "/" + getAbsolutePathRecursive()
      */
     public String getAbsolutePath() {
         return "/" + getAbsolutePathRecursive();

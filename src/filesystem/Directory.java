@@ -5,19 +5,13 @@ import java.util.ArrayList;
 
 /**
  * A class of directories, inheriting from the class Item, within a filesystem
- * @invar	Each directory must have a valid name.
- * 	        | isValidName(getName())
  * @invar   Each directory must have valid contents.
  *          | hasProperItems()
- * @invar   The items in this directory are ordered at all times.
- *          | isOrdered(items)
  * @invar   The names of the items in a directory must always be unique.
  *          | for each item in Item:
  *          |       for each otherItem in Item:
  *          |           if (item != otherItem)
  *          |               item.getName() != otherItem.getName()
- * @invar   The disk-usage of a directory is always valid.
- *          | canHaveAsDiskUsage(getDiskUsage)
  * @author  Vincent Van Schependom
  * @author  Flor De Meulemeester
  * @author  Arne Claerhout
@@ -219,11 +213,18 @@ public class Directory extends Item {
      * @throws  NotWritableException
      *          The directory is not writable.
      *          | ! isWritable()
+     * @throws  NullPointerException
+     *          The item is null.
+     *          | item == null
      */
+    @Raw
     protected void addItem(Item item) throws
-            NullPointerException, NotWritableException, IllegalItemException, IllegalArgumentException {
+            NullPointerException, NotWritableException {
         if (!isWritable()) {
             throw new NotWritableException(this);
+        }
+        if (item == null) {
+            throw new NullPointerException("Item is null.");
         }
         int index = getIndexForItem(item);
         insertItemAtIndex(index, item);
@@ -237,15 +238,9 @@ public class Directory extends Item {
      * @return  The index of this item based on the lexicographical order within the directory.
      *          | (items.getItemAt(result-1).getName().compareTo(item.getName()) < 0)
      *          |   && (items.getItemAt(result+1).getName().compareTo(item.getName()) > 0)
-     * @throws  IllegalArgumentException
-     *          The item is already in the directory
-     *          | hasAsItem(item)
      */
+    @Raw
     private int getIndexForItem(Item item) {
-        // TODO: opnieuw, is dit nodig? we checken vaak alles twee keer...
-        if (hasAsItem(item)) {
-            throw new IllegalArgumentException("Item is already in directory.");
-        }
         // get the index based on the lexicographical order
         int index = 0;
         for (Item otherItem : items) {
@@ -265,18 +260,12 @@ public class Directory extends Item {
      *          The item to be inserted.
      * @post    The item is inserted at the given index
      *          | items.getItemAt(index) == item
-     * @throws  NotWritableException
-     *          The directory is not writable
-     *          | ! isWritable()
      * @throws  IndexOutOfBoundsException
      *          The index is not a valid index for this directory
      *          | ! canHaveAsIndex(index)
      */
-    private void insertItemAtIndex(int index, Item item) throws NotWritableException, IndexOutOfBoundsException {
-        // TODO kijk na of dit wel effectief nodig is, want we checken alles al in addItem:
-        /*if(!isWritable()) {
-            throw new NotWritableException(this);
-        }*/
+    @Raw
+    private void insertItemAtIndex(int index, Item item) throws IndexOutOfBoundsException {
         if(!canHaveAsIndex(index)) {
             throw new IndexOutOfBoundsException();
         }
@@ -329,15 +318,11 @@ public class Directory extends Item {
      *
      * @return  The index of the given item in item, if it is present in the directory.
      *          | result == items.indexOf(item)
-     * @throws  NullPointerException
-     *          The item is null.
-     *          | item == null
      * @throws  IllegalArgumentException
      *          The item is not in the directory.
      *          | ! hasAsItem(item)
      */
     public int getIndexOf(Item item) throws NullPointerException, IllegalArgumentException {
-        if (item == null) throw new NullPointerException("Item is null.");
         if (!hasAsItem(item)) {
             throw new IllegalArgumentException("Item is not in directory.");
         }
@@ -355,6 +340,7 @@ public class Directory extends Item {
      *          | result == ( (index >= 0)
      *          |   && (index < getNbOfItems()) )
      */
+    @Raw
     public boolean canHaveAsIndex(int index) {
         return index >= 0 && index <= getNbOfItems();
     }
@@ -438,6 +424,7 @@ public class Directory extends Item {
      *          False if item is its own parent directory
      *          | result == (item != null) && item.getParentDirectory() == this
      */
+    @Raw
     public boolean canHaveAsItem(Item item) {
         return (item != null)
                 && item.getParentDirectory() == this;
@@ -454,6 +441,7 @@ public class Directory extends Item {
      *          |               canHaveAsItem(item) )
      *          |           && ( isOrdered() )
      */
+    @Raw
     public boolean hasProperItems() {
         for (Item item : items) {
             if ( !canHaveAsItem(item) ) {
@@ -472,6 +460,7 @@ public class Directory extends Item {
      *         |           && ( for each item in items:
      *         |               item.getName().compareTo(getItemAt(getIndexOf(item)-1).getName()) > 0 )
      */
+    @Raw
     public boolean isOrdered() {
         String previousName = "";
         for (Item item : items) {
@@ -567,19 +556,18 @@ public class Directory extends Item {
      *          number is equal to the sum of all disk usages of every item
      *          in this directory.
      *          | result ==
-     *          |    ( nbOfBytes >= 0 ) &&
+     *          |    isValidDiskUsage(nbOfBytes) &&
      *          |    ( nbOfBytes == getSumOfDiskUsages() )
      */
     public boolean canHaveAsDiskUsage(int nbOfBytes) {
-        return (nbOfBytes >= 0) && (nbOfBytes == getSumOfDiskUsages());
+        return isValidDiskUsage(nbOfBytes) && (nbOfBytes == getSumOfDiskUsages());
     }
 
     /**
      * A method for calculating the som of all disk usages of the items in this directory.
      * @return  The sum of all disk usages of the items in this directory.
-     *          | for item in items
-     *          |   result += item.getTotalDiskUsage()
-     *          |
+     *          | result == ( sum ( for each item in items:
+     *          |                   item.getTotalDiskUsage() ) )
      */
     @Model
     private int getSumOfDiskUsages() {
