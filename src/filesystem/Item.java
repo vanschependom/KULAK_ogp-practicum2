@@ -373,11 +373,8 @@ public abstract class Item {
      */
     public boolean canHaveAsParentDirectory(Directory dir) {
         // the name must not be taken
-        if (dir.containsDiskItemWithNameCaseSensitive(getName())) {
-            return false;
-        }
-        return true;
-    }
+        return !dir.containsDiskItemWithNameCaseSensitive(getName());
+	}
 
     /**
      * Set the parent directory of this item to the given directory <dir>.

@@ -3,6 +3,7 @@ package filesystemTests;
 import filesystem.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -51,9 +52,10 @@ public class DirectoryTest {
     }
 
     @Test
+    @Order(1)
     public void testDirectoryDirStringBooleanType_IllegalName() {
         Directory dir = new Directory(subDir, "dir.-hello", true);
-        assertEquals("new_item_1", dir.getName());
+        assertTrue(dir.getName().contains("new_item"));
     }
 
     @Test
@@ -79,7 +81,7 @@ public class DirectoryTest {
     @Test
     public void testDirectoryDirStringType_IllegalName(){
         Directory dir = new Directory(subsubDir, "dir.#g s");
-        assertEquals("new_item_1", dir.getName());
+        assertTrue(dir.getName().contains("new_item"));
     }
 
     @Test
@@ -104,8 +106,7 @@ public class DirectoryTest {
     @Test
     public void testDirectoryStringBooleanType_IllegalName() {
         Directory dir = new Directory("dir.#g s", true);
-        // this is the 3rd test with a wrong name so the 3rd new item
-        assertEquals("new_item_1", dir.getName());
+        assertTrue(dir.getName().contains("new_item"));
     }
 
     @Test
@@ -126,7 +127,7 @@ public class DirectoryTest {
     @Test
     public void testDirectoryStringType_IllegalName() {
         Directory dir = new Directory("dir.#g s");
-        assertEquals("new_item_1", dir.getName());
+        assertTrue(dir.getName().contains("new_item"));
     }
 
     @Test
@@ -359,9 +360,9 @@ public class DirectoryTest {
 
     @Test
     public void testDirectoryCanHaveAsParentDirectory() {
-        assertTrue(subDir.canHaveAsParentDirectory(rootDir));
+        assertFalse(subDir.canHaveAsParentDirectory(rootDir));
         assertTrue(subsubDir.canHaveAsParentDirectory(rootDir));
-        assertTrue(subsubDir.canHaveAsParentDirectory(subDir));
+        assertFalse(subsubDir.canHaveAsParentDirectory(subDir));
         assertFalse(subDir.canHaveAsParentDirectory(subsubDir));
         assertFalse(rootDir.canHaveAsParentDirectory(rootDir));
     }

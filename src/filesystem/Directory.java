@@ -129,20 +129,6 @@ public class Directory extends Item {
         super.delete();
     }
 
-    /* TODO staat in klassendiagram maar wordt nergens gebruikt, staat ook nog niet in Item als we het wel zouden implementeren
-    /**
-     * A method for checking if a directory is deletable.
-     *
-     * @return  True if the number of items of the directory is zero
-     *          and the directory is writable, false otherwise.
-     *          | result == (getNbOfItems() == 0) && isWritable()
-     *
-    @Override
-    public boolean isDeletable() {
-        return (getNbOfItems() == 0) && isWritable();
-    }
-    */
-
 
 
     /**
@@ -487,13 +473,9 @@ public class Directory extends Item {
      *         |               item.getName().compareTo(getItemAt(getIndexOf(item)-1).getName()) > 0 )
      */
     public boolean isOrdered() {
+        String previousName = "";
         for (Item item : items) {
-            if (item.getName().compareTo(getItemAt(getIndexOf(item)+1).getName()) < 0) {
-                return false;
-            }
-        }
-        for (Item item : items) {
-            if (item.getName().compareTo(getItemAt(getIndexOf(item)-1).getName()) > 0) {
+            if (item.getName().compareTo(previousName) < 0) {
                 return false;
             }
         }
