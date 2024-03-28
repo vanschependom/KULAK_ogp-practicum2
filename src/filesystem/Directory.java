@@ -541,16 +541,16 @@ public class Directory extends Item {
      *
      * @param   dir
      *          The directory to check.
-     * @return  True if the directory can be the parent directory
+     * @return  True if the given directory can be the parent directory
      *          of an item and if no loops wil be created.
      *          | result == ( super.canHaveAsParentDirectory(dir)
-     *          |  && !isDirectOrIndirectChildOf(dir) )
+     *          |  && !isDirectOrIndirectChildOf(dir) && dir != this)
      */
     @Override
     public boolean canHaveAsParentDirectory(Directory dir) {
         return (dir == null) || (( super.canHaveAsParentDirectory(dir) )
                 // check for loops
-                && ( !isDirectOrIndirectChildOf(dir) ));
+                && ( !isDirectOrIndirectChildOf(dir) ) && (dir != this));
     }
 
 

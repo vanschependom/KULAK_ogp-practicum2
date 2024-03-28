@@ -325,6 +325,50 @@ public class DirectoryTest {
         assertTrue(subsubDir.containsDiskItemWithNameCaseSensitive("file1"));
     }
 
+    @Test
+    public void testDirectoryCanHaveAsItem() {
+        File file2 = new File(subsubDir, "file6", FileType.PDF);
+        assertFalse(rootDir.canHaveAsItem(file2));
+        assertFalse(subDir.canHaveAsItem(file2));
+        assertTrue(subsubDir.canHaveAsItem(file2));
+    }
+
+    @Test
+    public void testDirectoryHasProperItems() {
+        assertTrue(rootDir.hasProperItems());
+        assertTrue(subDir.hasProperItems());
+        assertTrue(subsubDir.hasProperItems());
+    }
+
+    @Test
+    public void testDirectoryIsOrdered() {
+        assertTrue(rootDir.isOrdered());
+        assertTrue(subDir.isOrdered());
+        assertTrue(subsubDir.isOrdered());
+        assertTrue(dirFull.isOrdered());
+        assertTrue(dirNameAndWriteable.isOrdered());
+    }
+
+    @Test
+    public void testDirectoryMakeRoot() {
+        Directory dir = new Directory(rootDir, "Directory");
+        dir.makeRoot();
+        assertNull(dir.getParentDirectory());
+        assertNotNull(dir.getModificationTime());
+    }
+
+    @Test
+    public void testDirectoryCanHaveAsParentDirectory() {
+        assertTrue(subDir.canHaveAsParentDirectory(rootDir));
+        assertTrue(subsubDir.canHaveAsParentDirectory(rootDir));
+        assertTrue(subsubDir.canHaveAsParentDirectory(subDir));
+        assertFalse(subDir.canHaveAsParentDirectory(subsubDir));
+        assertFalse(rootDir.canHaveAsParentDirectory(rootDir));
+    }
+
+
+
+
 
 
     private void sleep() {
