@@ -53,7 +53,9 @@ public abstract class Item {
     @Raw
     public Item(String name, Directory dir) throws IllegalParentDirectoryException {
         setName(name);
-        move(dir);
+        if (dir != null) {
+            move(dir);
+        }
     }
 
 
@@ -351,8 +353,7 @@ public abstract class Item {
     public boolean isAddableToDirectory(Directory dir) {
         return dir != null
                 && !dir.hasAsItem(this)
-                && !dir.containsDiskItemWithNameCaseSensitive(getName())
-                && this.canHaveAsParentDirectory(dir);
+                && !dir.containsDiskItemWithNameCaseSensitive(getName());
     }
 
     /**
@@ -387,8 +388,6 @@ public abstract class Item {
     protected void setParentDirectory(Directory dir) {
         if (isDeleted() && dir == null) {
             parentDirectory = null;
-        } else if ( !canHaveAsParentDirectory(dir) ) {
-            throw new IllegalParentDirectoryException(dir);
         } else {
             parentDirectory = dir;
         }
@@ -502,8 +501,8 @@ public abstract class Item {
         if (getParentDirectory() != null) {
             getParentDirectory().removeAsItem(this);
         }
-        dir.addItem(this);
         setParentDirectory(dir);
+        dir.addItem(this);
     }
 
     /**

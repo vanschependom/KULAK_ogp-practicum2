@@ -42,6 +42,9 @@ public class Directory extends Item {
     @Raw
     public Directory(Directory dir, String name, boolean writable) {
         super(name, dir);
+        if (dir == null) {
+            setParentDirectory(null);
+        }
         setWritable(writable);
     }
 
