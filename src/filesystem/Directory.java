@@ -560,10 +560,10 @@ public class Directory extends Item {
      *          in this directory.
      *          | result ==
      *          |    isValidDiskUsage(nbOfBytes) &&
-     *          |    ( nbOfBytes == getSumOfDiskUsages() )
+     *          |    ( nbOfBytes == getTotalDiskUsage() )
      */
     public boolean canHaveAsDiskUsage(int nbOfBytes) {
-        return isValidDiskUsage(nbOfBytes) && (nbOfBytes == getSumOfDiskUsages());
+        return isValidDiskUsage(nbOfBytes) && (nbOfBytes == getTotalDiskUsage());
     }
 
     /**
@@ -572,9 +572,10 @@ public class Directory extends Item {
      *          | result == ( sum ( for each item in items:
      *          |                   item.getTotalDiskUsage() ) )
      */
-    @Model
-    private int getSumOfDiskUsages() {
+    @Override @Raw
+    public int getTotalDiskUsage() {
         int sum = 0;
+        if (items == null || getNbOfItems() == 0) return 0;
         for (Item item : items) {
             sum += item.getTotalDiskUsage();
         }

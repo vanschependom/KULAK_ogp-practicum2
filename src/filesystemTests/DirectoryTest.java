@@ -26,7 +26,7 @@ public class DirectoryTest {
         subDir = new Directory(rootDir,"subDir");
         timeDuringCreation = new Date();
         subsubDir = new Directory(subDir,"subsubDir");
-        file1 = new File(subsubDir, "file1", FileType.PDF);
+        file1 = new File(subsubDir, "file1", 10, true, FileType.PDF);
         dirFull = new Directory(rootDir, "dir", true);
         dirNameAndWriteable = new Directory("dir", false);
         //link = new Link("link", subDir, file1);
@@ -367,9 +367,30 @@ public class DirectoryTest {
         assertFalse(rootDir.canHaveAsParentDirectory(rootDir));
     }
 
+    @Test
+    public void testDirectoryCanHaveAsDiskUsage() {
+        File file = new File(rootDir, "item", 20, true, FileType.TEXT);
+        assertTrue(rootDir.canHaveAsDiskUsage(30));
+        assertTrue(subsubDir.canHaveAsDiskUsage(10));
+        assertTrue(dirFull.canHaveAsDiskUsage(0));
+        assertFalse(rootDir.canHaveAsDiskUsage(-20));
+        assertFalse(subsubDir.canHaveAsDiskUsage(12));
+        assertFalse(dirFull.canHaveAsDiskUsage(-30));
+    }
 
-
-
+    @Test
+    public void testDirectoryGetTotalDiskUsage() {
+        File file = new File(rootDir, "item", 20, true, FileType.TEXT);
+        assertEquals(30, rootDir.getTotalDiskUsage());
+        assertEquals(10, subDir.getTotalDiskUsage());
+        assertEquals(10, subsubDir.getTotalDiskUsage());
+        assertEquals(0, dirFull.getTotalDiskUsage());
+        File file2 = new File(subDir, "item2", 50, true, FileType.JAVA);
+        assertEquals(80, rootDir.getTotalDiskUsage());
+        assertEquals(60, subDir.getTotalDiskUsage());
+        assertEquals(10, subsubDir.getTotalDiskUsage());
+        assertEquals(0, dirFull.getTotalDiskUsage());
+    }
 
 
     private void sleep() {
