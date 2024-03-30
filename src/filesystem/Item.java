@@ -168,7 +168,7 @@ public abstract class Item {
      * @return   A valid item name.
      *          | isValidName(result)
      */
-    @Model @Raw
+    @Raw @Model
     private static String getDefaultName() {
         return "new_item_" + Integer.toString(nameIndex++);
     }
@@ -384,7 +384,7 @@ public abstract class Item {
      *          The provided parent directory is not a valid parent directory
      *          | ! canHaveAsParentDirectory(dir)
      */
-    @Model
+    @Model @Raw
     protected void setParentDirectory(Directory dir) {
         if (isDeleted() && dir == null) {
             parentDirectory = null;
@@ -463,6 +463,7 @@ public abstract class Item {
      *
      * @note    We implemented this nominally, so we expect a legal value.
      */
+    @Raw
     protected void setDiskUsage(int diskUsage) {
         this.diskUsage = diskUsage;
     }

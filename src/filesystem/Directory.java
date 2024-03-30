@@ -324,6 +324,9 @@ public class Directory extends Item {
      * @throws  IllegalArgumentException
      *          The item is not in the directory.
      *          | ! hasAsItem(item)
+     * @throws  NullPointerException
+     *          The item is null.
+     *          | item == null
      */
     public int getIndexOf(Item item) throws NullPointerException, IllegalArgumentException {
         if (!hasAsItem(item)) {
@@ -482,6 +485,9 @@ public class Directory extends Item {
      * @throws  IllegalItemException
      *          The item is not valid.
      *          | ! hasAsItem(item)
+     * @throws  NullPointerException
+     *          The item is a null pointer
+     *          | item == null
      */
     protected void removeAsItem(Item item) throws NullPointerException, IllegalItemException {
         if (!hasAsItem(item)) {

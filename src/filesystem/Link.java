@@ -7,6 +7,8 @@ import be.kuleuven.cs.som.annotate.*;
  *
  * @invar   The linked item must be valid.
  *          | isValidLinkedItem(getLinkedItem())
+ * @invar   The disk usage of a linked item is always 0.
+ *          | getTotalDiskUsage() == 0
  *
  * @author  Vincent Van Schependom
  * @author  Flor De Meulemeester
