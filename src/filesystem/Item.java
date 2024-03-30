@@ -49,12 +49,17 @@ public abstract class Item {
      *          | (new.getCreationTime().getTime() <= (new System).currentTimeMillis())
      * @post    The new item has no time of last modification.
      *          | new.getModificationTime() == null
+     * @throws  IllegalParentDirectoryException
+     *          The directory is not legal for this item
+     *          | ( ( ! (this instanceof Directory) && dir == null) || ! isAddableToDirectory(dir))
      */
     @Raw
     public Item(String name, Directory dir) throws IllegalParentDirectoryException {
         setName(name);
         if (dir != null) {
             move(dir);
+        } else if (!(this instanceof Directory)) {
+            throw new IllegalParentDirectoryException(null);
         }
     }
 
