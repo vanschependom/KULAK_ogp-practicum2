@@ -9,7 +9,7 @@ import org.junit.jupiter.api.function.Executable;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * A JUnit 4 test class for testing the public methods of the File Class  
+ * A JUnit 5 test class for testing the public methods of the File Class
  * @author Flor Demeulemeester
  * @author Arne Claerhout
  * @author Vincent Van Schependom
