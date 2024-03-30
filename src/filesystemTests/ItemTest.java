@@ -96,7 +96,6 @@ public class ItemTest {
     @Test
     public void testItemIsDirectoOrIndirectChildOf() {
         // test different files and directories
-        // TODO deze werken nog niet
         assertTrue(file1.isDirectOrIndirectChildOf(rootDir));
         assertTrue(file1.isDirectOrIndirectChildOf(subDir));
         assertTrue(file1.isDirectOrIndirectChildOf(subSubDir));
