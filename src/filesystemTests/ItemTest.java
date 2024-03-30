@@ -3,6 +3,8 @@ package filesystemTests;
 import filesystem.*;
 import org.junit.jupiter.api.*;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
  * A JUnit 5 test class for testing the public methods of the Item Class.
  *
@@ -31,32 +33,120 @@ public class ItemTest {
 
     @Test
     public void absolutePathTest1(){
-        Assertions.assertEquals("/rootDir/subDir/subSubDir/file1.pdf", file1.getAbsolutePath());
+        assertEquals("/rootDir/subDir/subSubDir/file1.pdf", file1.getAbsolutePath());
     }
 
     @Test
     public void absolutePathTest2(){
-        Assertions.assertEquals("/rootDir/subDir/main.java", main.getAbsolutePath());
+        assertEquals("/rootDir/subDir/main.java", main.getAbsolutePath());
     }
 
     @Test
     public void absolutePathTest3(){
-        Assertions.assertEquals("/rootDir/link_to_main", link.getAbsolutePath());
+        assertEquals("/rootDir/link_to_main", link.getAbsolutePath());
     }
 
     @Test
     public void absolutePathTest4(){
-        Assertions.assertEquals("/rootDir", rootDir.getAbsolutePath());
+        assertEquals("/rootDir", rootDir.getAbsolutePath());
     }
 
     @Test
     public void absolutePathTest5(){
-        Assertions.assertEquals("/rootDir/subDir", subDir.getAbsolutePath());
+        assertEquals("/rootDir/subDir", subDir.getAbsolutePath());
     }
 
     @Test
     public void absolutePathTest6(){
-        Assertions.assertEquals("/rootDir/subDir/subSubDir", subSubDir.getAbsolutePath());
+        assertEquals("/rootDir/subDir/subSubDir", subSubDir.getAbsolutePath());
+    }
+
+    @Test
+    public void testItemChangeName() {
+        assertEquals("file1", file1.getName());
+        file1.changeName("g $d#@a");
+        assertEquals("file1", file1.getName());
+        assertNull(file1.getModificationTime());
+        file1.changeName("mamamia");
+        assertEquals("mamamia", file1.getName());
+        assertNotNull(file1.getModificationTime());
+        File file2 = new File(rootDir, "file2", 12, false, FileType.TEXT);
+        assertThrows(NotWritableException.class, () -> {
+            file2.changeName("test");
+        });
+        Directory dir = new Directory(rootDir, "testDir", false);
+        assertThrows(NotWritableException.class, () -> {
+            dir.changeName("test");
+        });
+
+    }
+
+    @Test
+    public void testItemIsAddableToDirectory() {
+        assertTrue(file1.isAddableToDirectory(rootDir));
+        assertTrue(file1.isAddableToDirectory(subDir));
+        assertFalse(file1.isAddableToDirectory(subSubDir));
+        File file2 = new File(rootDir, "file1", FileType.PDF);
+        assertFalse(file2.isAddableToDirectory(rootDir));
+        assertTrue(file2.isAddableToDirectory(subDir));
+        assertFalse(file2.isAddableToDirectory(subSubDir));
+        assertFalse(file2.isAddableToDirectory(null));
+    }
+
+    @Test
+    public void testItemIsDirectoOrIndirectChildOf() {
+        // test different files and directories
+        // TODO deze werken nog niet
+        assertTrue(file1.isDirectOrIndirectChildOf(rootDir));
+        assertTrue(file1.isDirectOrIndirectChildOf(subDir));
+        assertTrue(file1.isDirectOrIndirectChildOf(subSubDir));
+        assertTrue(main.isDirectOrIndirectChildOf(rootDir));
+        assertTrue(main.isDirectOrIndirectChildOf(subDir));
+        assertFalse(main.isDirectOrIndirectChildOf(subSubDir));
+        assertFalse(rootDir.isDirectOrIndirectChildOf(rootDir));
+        assertFalse(rootDir.isDirectOrIndirectChildOf(subDir));
+        assertFalse(rootDir.isDirectOrIndirectChildOf(subSubDir));
+    }
+
+    @Test
+    public void testItemMove_LegalCase_1() {
+        assertTrue(subSubDir.hasAsItem(file1));
+        file1.move(rootDir);
+        assertFalse(subSubDir.hasAsItem(file1));
+        assertTrue(rootDir.hasAsItem(file1));
+        assertEquals(rootDir, file1.getParentDirectory());
+    }
+
+    @Test
+    public void testItemMove_LegalCase_2() {
+        Directory dir = new Directory("dirTest");
+        rootDir.move(dir);
+        assertTrue(dir.hasAsItem(rootDir));
+        assertEquals(dir, rootDir.getParentDirectory());
+    }
+
+    @Test
+    public void testItemMove_IllegalCase_1() {
+        assertTrue(subDir.hasAsItem(subSubDir));
+        assertThrows(IllegalParentDirectoryException.class, () -> {
+            subDir.move(subSubDir);
+        });
+    }
+
+    @Test
+    public void testItemMove_IllegalCase_2() {
+        assertTrue(subDir.hasAsItem(subSubDir));
+        assertThrows(NullPointerException.class, () -> {
+            subDir.move(null);
+        });
+    }
+
+    @Test
+    public void testItemMove_IllegalCase_3() {
+        assertTrue(subDir.hasAsItem(subSubDir));
+        assertThrows(IllegalParentDirectoryException.class, () -> {
+            subDir.move(subDir);
+        });
     }
 
 }

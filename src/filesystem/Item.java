@@ -189,6 +189,8 @@ public abstract class Item {
      *          | then setModificationTime()
      */
     public void changeName(String name) {
+        if (this instanceof Directory && !((Directory) this).isWritable()) throw new NotWritableException(this);
+        if (this instanceof File && !((File) this).isWritable()) throw new NotWritableException(this);
         if (isValidName(name)){
             setName(name);
             setModificationTime();
@@ -345,15 +347,12 @@ public abstract class Item {
      * @return  True if the file is not already in the directory,
      *          the dir doesn't already contain an item with this items name
      *          and this item can have the given dir as its parent dir.
-     *          | result == ( dir != null
-     *          |               && !dir.hasAsItem(this)
-     *          |               && !dir.containsDiskItemWithNameCaseSensitive(getName())
+     *          | result == ( !dir.hasAsItem(this)
      *          |               && this.canHaveAsParentDirectory(dir) )
      */
     public boolean isAddableToDirectory(Directory dir) {
-        return dir != null
-                && !dir.hasAsItem(this)
-                && !dir.containsDiskItemWithNameCaseSensitive(getName());
+        return this.canHaveAsParentDirectory(dir)
+                && !dir.hasAsItem(this);
     }
 
     /**
@@ -376,21 +375,12 @@ public abstract class Item {
      *
      * @param   dir
      *          The directory we want the parent directory to be set to.
-     * @post    If the given directory is valid as parent directory then the new parent
-     *          directory is set to dir.
-     *          | if canHaveAsParentDirectory(dir)
-     *          |   new.getParentDirectory() == dir
-     * @throws  IllegalParentDirectoryException
-     *          The provided parent directory is not a valid parent directory
-     *          | ! canHaveAsParentDirectory(dir)
+     * @post    The parent directory is set to the given directory.
+     *          | parentDirectory = dir
      */
     @Model @Raw
     protected void setParentDirectory(Directory dir) {
-        if (isDeleted() && dir == null) {
-            parentDirectory = null;
-        } else {
-            parentDirectory = dir;
-        }
+        parentDirectory = dir;
     }
 
     /**
@@ -412,13 +402,13 @@ public abstract class Item {
      * @param   dir
      *          The directory to check.
      * @return  True if the given directory is a direct or indirect parent of this item.
-     *          | result == ( dir != null && (dir == getParentDirectory())
-     *          |   || isDirectOrIndirectChildOf(dir.getParentDirectory()) )
+     *          | result == (dir == getParentDirectory()) && ( dir != null || getParentDirectory() == null )
+     *          |   || getParentDirectory().isDirectOrIndirectChildOf(dir) )
      */
     public boolean isDirectOrIndirectChildOf(Directory dir) {
-        if (dir == null) return false;
         if (dir == getParentDirectory()) return true;
-        return isDirectOrIndirectChildOf(dir.getParentDirectory());
+        if (dir == null || getParentDirectory() == null) return false;
+        return getParentDirectory().isDirectOrIndirectChildOf(dir);
     }
 
 
@@ -493,9 +483,13 @@ public abstract class Item {
      *          |   then setParentDirectory(dir)
      * @throws  IllegalParentDirectoryException
      *          The given directory is not a valid parent directory.
+     *          | ! isAddableToDirectory(dir)
+     * @throws  NullPointerException
+     *          The given directory is null
+     *          | dir == null
      */
     @Raw
-    public void move(Directory dir) throws IllegalParentDirectoryException {
+    public void move(Directory dir) throws IllegalParentDirectoryException, NullPointerException {
         if (!isAddableToDirectory(dir)) {
             throw new IllegalParentDirectoryException(dir);
         }
