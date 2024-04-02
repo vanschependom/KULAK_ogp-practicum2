@@ -20,7 +20,6 @@ public class ItemTest {
     Link link;
 
 
-
     @BeforeEach
     public void setUpFixture(){
         rootDir = new Directory("rootDir");
@@ -94,7 +93,7 @@ public class ItemTest {
     }
 
     @Test
-    public void testItemIsDirectoOrIndirectChildOf() {
+    public void testItemIsDirectOrIndirectChildOf() {
         // test different files and directories
         assertTrue(file1.isDirectOrIndirectChildOf(rootDir));
         assertTrue(file1.isDirectOrIndirectChildOf(subDir));
@@ -145,6 +144,57 @@ public class ItemTest {
         assertTrue(subDir.hasAsItem(subSubDir));
         assertThrows(IllegalParentDirectoryException.class, () -> {
             subDir.move(subDir);
+        });
+    }
+
+    @Test
+    public void testDeleteRecursive_LegalCase1(){
+        // We will delete rootDir
+        // Everything has to be deleted
+        rootDir.deleteRecursive();
+        // All the directories must be empty
+        assertEquals(0, rootDir.getNbOfItems());
+        assertEquals(0, subSubDir.getNbOfItems());
+        assertEquals(0, subDir.getNbOfItems());
+        // All the parent directories must be null
+        assertNull(subDir.getParentDirectory());
+        assertNull(subSubDir.getParentDirectory());
+        assertNull(file1.getParentDirectory());
+        assertNull(main.getParentDirectory());
+        assertNull(link.getParentDirectory());
+        // All items must be deleted
+        assertTrue(rootDir.isDeleted());
+        assertTrue(subDir.isDeleted());
+        assertTrue(subSubDir.isDeleted());
+        assertTrue(file1.isDeleted());
+        assertTrue(main.isDeleted());
+        assertTrue(link.isDeleted());
+    }
+
+    @Test
+    public void testDeleteRecursive_LegalCase2(){
+        // We will delete main
+        main.deleteRecursive();
+        assertEquals(2, rootDir.getNbOfItems());
+        assertEquals(1, subSubDir.getNbOfItems());
+        assertEquals(1, subDir.getNbOfItems());
+        assertNull(main.getParentDirectory());
+        assertTrue(main.isDeleted());
+    }
+
+    @Test
+    public void testDeleteRecursive_IllegalCase1() {
+        rootDir.setWritable(false);
+        assertThrows(NotWritableException.class, () -> {
+            rootDir.deleteRecursive();
+        });
+    }
+
+    @Test
+    public void testDeleteRecursive_IllegalCase2() {
+        file1.setWritable(false);
+        assertThrows(NotWritableException.class, () -> {
+            file1.deleteRecursive();
         });
     }
 

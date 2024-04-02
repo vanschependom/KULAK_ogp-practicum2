@@ -19,6 +19,7 @@ __
     + boolean isDirectOrIndirectChildOf(Directory dir)
     + int getTotalDiskUsage()
     + String getAbsolutePath()
+    + void deleteRecursive()
 ..Getters & setters..
     + String getName()
     - void setName(String name)

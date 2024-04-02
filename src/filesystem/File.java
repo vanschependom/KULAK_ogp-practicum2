@@ -52,13 +52,12 @@ public class File extends Item {
      *          | ! isValidFileType()
      */
     @Raw
-    public File(Directory dir, String name, int size, boolean writable, FileType type) throws IllegalParentDirectoryException, IllegalArgumentException {
-        super(name, dir); // This throws IllegalParentDirectoryException
+    public File(Directory dir, String name, int size, boolean writable, FileType type) throws IllegalParentDirectoryException, IllegalArgumentException, NullPointerException {
+        super(name, dir); // This throws IllegalParentDirectoryException and NullPointerException
         if (!isValidFileType(type)) {
             throw new IllegalArgumentException("This is not a valid file type.");
         }
-        // final variable must be initialized this way
-        fileType = type;
+        fileType = type; // final variable must be initialized this way
         setWritable(writable);
         setSize(size); // this also sets the disk usage
     }
@@ -135,7 +134,7 @@ public class File extends Item {
      *         The new size for this file.
      * @pre    The given size must be legal.
      *         | isValidSize(size)
-     * @effect The disk usage is set to the valid filesize.
+     * @effect The disk usage is set to the valid file size.
      *         | setDiskUsage(size)
      * @post   The given size is registered as the size of this file.
      *         | new.getSize() == size
@@ -305,7 +304,7 @@ public class File extends Item {
      * @throws  NotWritableException
      *          This file is not writable.
      *          | ! isWritable()
-     * @note    This needs to be overriden because the superclass doesn't
+     * @note    This needs to be overridden because the superclass doesn't
      *          have an implementation for writability.
      */
     @Override

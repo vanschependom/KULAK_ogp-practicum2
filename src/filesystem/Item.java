@@ -54,7 +54,7 @@ public abstract class Item {
      *          | ( ( ! (this instanceof Directory) && dir == null) || ! isAddableToDirectory(dir))
      */
     @Raw
-    public Item(String name, Directory dir) throws IllegalParentDirectoryException {
+    public Item(String name, Directory dir) throws IllegalParentDirectoryException, NullPointerException {
         setName(name);
         if (dir != null) {
             move(dir);
@@ -101,11 +101,25 @@ public abstract class Item {
     /**
      * A method for checking if this item is deleted.
      */
+    @Basic
     public boolean isDeleted() {
         return isDeleted;
     }
 
-
+    /**
+     * A recursive method for deleting an item recursively.
+     *
+     * @post    The item is deleted
+     *          | delete()
+     * @throws  NotWritableException
+     *          When the directory is not recursively deletable
+     *          because a file or directory within is not writable
+     *          | ! isRecursivelyDeletable()
+     */
+    public void deleteRecursive() throws NotWritableException {
+        // if it is a directory, the overridden method will be used
+        delete(); // if it is a different item we can just delete it normally
+    }
 
     /**********************************************************
      * name - total programming
@@ -175,7 +189,7 @@ public abstract class Item {
      */
     @Raw @Model
     private static String getDefaultName() {
-        return "new_item_" + Integer.toString(nameIndex++);
+        return "new_item_" + nameIndex++;
     }
 
     /**
@@ -408,7 +422,7 @@ public abstract class Item {
      *          The directory to check.
      * @return  True if the given directory is a direct or indirect parent of this item.
      *          | result == (dir == getParentDirectory()) && ( dir != null || getParentDirectory() == null )
-     *          |   || getParentDirectory().isDirectOrIndirectChildOf(dir) )
+     *          |   || ( getParentDirectory().isDirectOrIndirectChildOf(dir) )
      */
     public boolean isDirectOrIndirectChildOf(Directory dir) {
         if (dir == getParentDirectory()) return true;

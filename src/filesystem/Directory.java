@@ -127,7 +127,6 @@ public class Directory extends Item {
     }
 
 
-
     /**
      * A recursive method for deleting a directory recursively
      *
@@ -140,14 +139,15 @@ public class Directory extends Item {
      *          because a file or directory within is not writable
      *          | ! isRecursivelyDeletable()
      */
+    @Override
     public void deleteRecursive() throws NotWritableException {
         if (!isRecursivelyDeletable()) throw new NotWritableException(this);
         while (0 < getNbOfItems()) {
             Item item = getItemAt(0);
             if (item instanceof Directory) {
-                ((Directory) item).deleteRecursive();
+                item.deleteRecursive();
             }
-            else item.delete();
+            else item.deleteRecursive();
         }
         super.delete();
     }
@@ -220,7 +220,7 @@ public class Directory extends Item {
      *          The item is null.
      *          | item == null
      */
-    @Raw
+    @Raw @Model
     protected void addItem(Item item) throws
             NullPointerException, NotWritableException {
         if (!isWritable()) {
@@ -360,7 +360,7 @@ public class Directory extends Item {
      *          The item is null.
      *          | item == null
      */
-    public boolean hasAsItem(Item item) {
+    public boolean hasAsItem(Item item) throws NullPointerException{
         if (item == null) {
             throw new NullPointerException("Item is null.");
         }

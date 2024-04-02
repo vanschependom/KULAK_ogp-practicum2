@@ -11,6 +11,13 @@ import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * A JUnit 5 test class for testing the public methods of the Directory Class
+ *
+ * @author Flor Demeulemeester
+ * @author Arne Claerhout
+ * @author Vincent Van Schependom
+ */
 public class DirectoryTest {
 
     Date timeBeforeCreation = new Date();
@@ -141,9 +148,16 @@ public class DirectoryTest {
     }
 
     @Test
-    public void testDirectoryDelete_IllegalCase() {
+    public void testDirectoryDelete_IllegalCase1() {
         assertThrows(DirectoryNotEmptyException.class, () -> {
             rootDir.delete();
+        });
+    }
+
+    @Test
+    public void testDirectoryDelete_IllegalCase2() {
+        assertThrows(NotWritableException.class, () -> {
+            dirNameAndWriteable.delete();
         });
     }
 
@@ -303,7 +317,7 @@ public class DirectoryTest {
     }
 
     @Test
-    public void testDirectoryContainsDiskItemWithName() {
+    public void testDirectoryContainsDiskItemWithName_LegalCase() {
         // test different ways to write subdir
         assertTrue(rootDir.containsDiskItemWithName("subdir"));
         assertTrue(rootDir.containsDiskItemWithName("SubdIR"));
@@ -316,7 +330,14 @@ public class DirectoryTest {
     }
 
     @Test
-    public void testDirectoryContainsDiskItemWithNameCaseSensitive() {
+    public void testDirectoryContainsDiskItemWithName_IllegalCase(){
+        assertThrows(IllegalArgumentException.class, () -> {
+            rootDir.containsDiskItemWithName("file2 q@p>");
+        });
+    }
+
+    @Test
+    public void testDirectoryContainsDiskItemWithNameCaseSensitive_LegalCase() {
         // test different ways to write subdir
         assertFalse(rootDir.containsDiskItemWithNameCaseSensitive("subdir"));
         assertFalse(rootDir.containsDiskItemWithNameCaseSensitive("SubdIR"));
@@ -324,6 +345,13 @@ public class DirectoryTest {
         // test different ways to write file1
         assertFalse(subsubDir.containsDiskItemWithNameCaseSensitive("fILe1"));
         assertTrue(subsubDir.containsDiskItemWithNameCaseSensitive("file1"));
+    }
+
+    @Test
+    public void testDirectoryContainsDiskItemWithNameCaseSensitive_IllegalCase(){
+        assertThrows(IllegalArgumentException.class, () -> {
+            rootDir.containsDiskItemWithNameCaseSensitive("file2 q@p>");
+        });
     }
 
     @Test

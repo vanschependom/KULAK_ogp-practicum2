@@ -34,6 +34,9 @@ public class Link extends Item {
      *          | super(name, dir)
      * @post    The linked item of this link is set to the given linked item.
      *          | new.getLinkedItem() == linkedItem
+     * @throws  IllegalItemException
+     *          The given item is not a valid linked item.
+     *          | !isValidLinkedItem(linkedItem)
      */
     @Raw
     public Link(String name, Directory dir, Item linkedItem) throws IllegalItemException {
