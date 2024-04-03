@@ -39,8 +39,8 @@ public class Link extends Item {
      *          | !isValidLinkedItem(linkedItem)
      */
     @Raw
-    public Link(String name, Directory dir, Item linkedItem) throws IllegalItemException {
-        super(name, dir);
+    public Link(String name, Directory dir, Item linkedItem) throws IllegalItemException, IllegalParentDirectoryException, NullPointerException {
+        super(name, dir); // This throws IllegalParentDirectoryException and NullPointerException
         if (!isValidLinkedItem(linkedItem))
             throw new IllegalItemException(linkedItem);
         // set the final variable

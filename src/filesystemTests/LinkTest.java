@@ -3,7 +3,7 @@ package filesystemTests;
 import filesystem.*;
 import org.junit.jupiter.api.*;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * A JUnit 5 test class for testing the public methods of the Link Class.
@@ -36,9 +36,9 @@ public class LinkTest {
     @Test
     public void testConstructor_LegalCase(){
         Link new_link = new Link("new_link",subSubDir, file1);
-        Assertions.assertEquals("new_link",new_link.getName());
-        Assertions.assertEquals(subSubDir,new_link.getParentDirectory());
-        Assertions.assertEquals(file1,new_link.getLinkedItem());
+        assertEquals("new_link",new_link.getName());
+        assertEquals(subSubDir,new_link.getParentDirectory());
+        assertEquals(file1,new_link.getLinkedItem());
     }
 
     @Test
@@ -52,7 +52,7 @@ public class LinkTest {
     @Test
     public void testConstructor_IllegalCase2(){
         Link new_link = new Link("new_ &[l%%ink",subSubDir, file1);
-        Assertions.assertEquals("new_item_1",new_link.getName());
+        assertEquals("new_item_1",new_link.getName());
     }
 
     /**********************************************************
@@ -61,18 +61,18 @@ public class LinkTest {
 
     @Test
     public void testGetItem(){
-        Assertions.assertEquals(main,link.getLinkedItem());
+        assertEquals(main,link.getLinkedItem());
     }
 
     @Test
     public void testIsValidLinkedItem(){
-        Assertions.assertTrue(Link.isValidLinkedItem(file1));
-        Assertions.assertFalse(Link.isValidLinkedItem(link));
+        assertTrue(Link.isValidLinkedItem(file1));
+        assertFalse(Link.isValidLinkedItem(link));
     }
 
     @Test
     public void testHasProperLinkedItem(){
-        Assertions.assertTrue(link.hasProperLinkedItem());
+        assertTrue(link.hasProperLinkedItem());
     }
 
 }

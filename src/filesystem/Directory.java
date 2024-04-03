@@ -40,8 +40,8 @@ public class Directory extends Item {
      *          | new.getNbItems() == 0
      */
     @Raw
-    public Directory(Directory dir, String name, boolean writable) {
-        super(name, dir);
+    public Directory(Directory dir, String name, boolean writable) throws IllegalParentDirectoryException, NullPointerException {
+        super(name, dir); // This throws IllegalParentDirectoryException and NullPointerException
         if (dir == null) {
             setParentDirectory(null);
         }
@@ -60,8 +60,8 @@ public class Directory extends Item {
      *          | this(dir, name, true)
      */
     @Raw
-    public Directory(Directory dir, String name) {
-        this(dir, name, true);
+    public Directory(Directory dir, String name) throws IllegalParentDirectoryException, NullPointerException {
+        this(dir, name, true); // This throws IllegalParentDirectoryException and NullPointerException
     }
 
     /**
@@ -79,7 +79,7 @@ public class Directory extends Item {
      *          |   && this.getParentDirectory() == null
      */
     @Raw
-    public Directory(String name, boolean writable) {
+    public Directory(String name, boolean writable) throws IllegalParentDirectoryException, NullPointerException {
         this(null, name, writable);
     }
 
@@ -93,7 +93,7 @@ public class Directory extends Item {
      *          | this(null, name, true)
      */
     @Raw
-    public Directory(String name) {
+    public Directory(String name) throws IllegalParentDirectoryException, NullPointerException{
         this(null, name, true);
     }
 
@@ -144,10 +144,7 @@ public class Directory extends Item {
         if (!isRecursivelyDeletable()) throw new NotWritableException(this);
         while (0 < getNbOfItems()) {
             Item item = getItemAt(0);
-            if (item instanceof Directory) {
-                item.deleteRecursive();
-            }
-            else item.deleteRecursive();
+            item.deleteRecursive();
         }
         super.delete();
     }
