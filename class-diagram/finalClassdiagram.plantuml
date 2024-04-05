@@ -1,0 +1,113 @@
+@startuml
+
+top to bottom direction
+skinparam linetype ortho
+
+class Directory {
+  + Directory(Directory, String, boolean): 
+  + Directory(String, boolean): 
+  + Directory(Directory, String): 
+  + Directory(String): 
+  - items: ArrayList<Item>
+  - isWritable: boolean
+  + canHaveAsParentDirectory(Directory): boolean
+  + isValidName(String): boolean
+  + isWritable(): boolean
+  + delete(): void
+  + hasProperItems(): boolean
+  + canHaveAsDiskUsage(int): boolean
+  + makeRoot(): void
+  + getItemAt(int): Item
+  + getIndexOf(Item): int
+  + canHaveAsIndex(int): boolean
+  + canHaveAsItem(Item): boolean
+  + isOrdered(): boolean
+  - insertItemAtIndex(int, Item): void
+  + isRecursivelyDeletable(): boolean
+  + containsDiskItemWithName(String): Boolean
+  + hasAsItem(Item): boolean
+  - getIndexForItem(Item): int
+  + getTotalDiskUsage(): int
+  # removeAsItem(Item): void
+  + getItem(String): Item
+  + setWritable(boolean): void
+  + getNbOfItems(): int
+  - changeDiskUsageBy(int): void
+  # addItem(Item): void
+  + containsDiskItemWithNameCaseSensitive(String): Boolean
+  + deleteRecursive(): void
+}
+class File {
+  + File(Directory, String, int, boolean, FileType): 
+  + File(Directory, String, FileType): 
+  - isWritable: boolean
+  - size: int
+  - fileType: FileType
+  - maximumSize: int
+  - setSize(int): void
+  + isValidSize(int): boolean
+  + setWritable(boolean): void
+  + isWritable(): boolean
+  + changeName(String): void
+  + enlarge(int): void
+  + isValidFileType(FileType): boolean
+  - changeSize(int): void
+  + getAbsolutePath(): String
+  + shorten(int): void
+  + getSize(): int
+  + getMaximumSize(): int
+  + getFileType(): FileType
+  + delete(): void
+}
+class Item {
+  + Item(String, Directory): 
+  - modificationTime: Date
+  - nameIndex: int
+  - diskUsage: int
+  - parentDirectory: Directory
+  # isDeleted: boolean
+  - creationTime: Date
+  - name: String
+  + deleteRecursive(): void
+  + getAbsolutePath(): String
+  + delete(): void
+  + getTotalDiskUsage(): int
+  + hasProperParentDirectory(): boolean
+  + canHaveAsParentDirectory(Directory): boolean
+  - setName(String): void
+  + isValidDiskUsage(int): boolean
+  + changeName(String): void
+  # setDiskUsage(int): void
+  + isDeleted(): boolean
+  + canHaveAsModificationTime(Date): boolean
+  + getCreationTime(): Date
+  # setModificationTime(): void
+  + hasOverlappingUsePeriod(Item): boolean
+  # getAbsolutePathRecursive(): String
+  + getRoot(): Directory
+  + getName(): String
+  + getModificationTime(): Date
+  + isDirectOrIndirectChildOf(Directory): boolean
+  + isValidName(String): boolean
+  + isAddableToDirectory(Directory): boolean
+  + getParentDirectory(): Directory
+  # setParentDirectory(Directory): void
+  + isValidCreationTime(Date): boolean
+  - getDefaultName(): String
+  + move(Directory): void
+}
+class Link {
+  + Link(String, Directory, Item): 
+  - linkedItem: Item
+  + hasProperLinkedItem(): boolean
+  + getLinkedItem(): Item
+  + isValidLinkedItem(Item): boolean
+}
+
+Directory  -[#000082,plain]-^  Item      
+Directory "1" *-[#595959,plain]-> "items\n*" Item      
+File       -[#000082,plain]-^  Item      
+Item      "1" *-[#595959,plain]-> "parentDirectory\n1" Directory 
+Link       -[#000082,plain]-^  Item      
+Link      "1" *-[#595959,plain]-> "linkedItem\n1" Item      
+@enduml
